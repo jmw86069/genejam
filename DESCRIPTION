@@ -16,4 +16,4 @@ BugReports: http://github.com/jmw86069/genejam/issues
 VignetteBuilder: knitr
 Remotes: github::jmw86069/jamba
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.0.2
+RoxygenNote: 6.1.1

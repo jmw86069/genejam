@@ -97,6 +97,7 @@ freshenGenes <- function
  annLib=c("org.Hs.eg.db"),
  tryList=c("SYMBOL2EG", "ACCNUM2EG", "ALIAS2EG"),
  finalList=c("SYMBOL"),
+ split="[, /]+",
  sep=",",
  handle_multiple=c("first_try", "first_hit", "all"),
  empty_rule=c("original", "empty"),
@@ -117,13 +118,13 @@ freshenGenes <- function
       colnames(x) <- jamba::makeNames(rep("input", ncol(x)));
    }
    ## Expand columns containing delimited values if necessary
-   if (length(sep) > 0) {
+   if (length(split) > 0) {
       x <- data.frame(do.call(cbind,
          lapply(jamba::nameVector(colnames(x)), function(i){
          ix <- x[[i]];
-         if (jamba::igrepHas(sep, ix)) {
+         if (jamba::igrepHas(split, ix)) {
             ix <- jamba::rbindList(
-               jamba::rmNULL(strsplit(ix, sep),
+               jamba::rmNULL(strsplit(ix, split),
                   nullValue=""));
             colnames(ix) <- jamba::makeNames(rep(i, ncol(ix)));
          }
