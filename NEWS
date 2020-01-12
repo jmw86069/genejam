@@ -1,0 +1,11 @@
+# Version 0.0.2.900
+
+Note that genejam requires one Bioconductor annotation package,
+usually `org.Hs.eg.db` but can be any valid organism, such
+as `org.Mm.eg.db` for mouse, or `org.Rn.eg.db` for rat.
+
+## Bug fixes
+
+* Attempt to fix rare cases of NA values in `mget()`
+by using `jamba::rmNA()`.
+

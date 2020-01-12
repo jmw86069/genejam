@@ -122,8 +122,9 @@ freshenGenes <- function
          lapply(jamba::nameVector(colnames(x)), function(i){
          ix <- x[[i]];
          if (jamba::igrepHas(sep, ix)) {
-            ix <- jamba::rbindList(strsplit(ix, sep),
-               nullValue="");
+            ix <- jamba::rbindList(
+               jamba::rmNULL(strsplit(ix, sep),
+                  nullValue=""));
             colnames(ix) <- jamba::makeNames(rep(i, ncol(ix)));
          }
          ix;
@@ -171,7 +172,7 @@ freshenGenes <- function
             ido <- (nchar(x[[iname]]) > 0);
          }
          ix <- x[[iname]][ido];
-         ixu <- unique(ix);
+         ixu <- jamba::rmNA(unique(ix));
          if (verbose) {
             jamba::printDebug("ixu:", ixu);
             jamba::printDebug("class(itry):", class(itry));
