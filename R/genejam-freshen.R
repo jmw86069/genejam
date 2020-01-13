@@ -121,15 +121,15 @@ freshenGenes <- function
    if (length(split) > 0) {
       x <- data.frame(do.call(cbind,
          lapply(jamba::nameVector(colnames(x)), function(i){
-         ix <- x[[i]];
-         if (jamba::igrepHas(split, ix)) {
-            ix <- jamba::rbindList(
-               jamba::rmNULL(strsplit(ix, split),
-                  nullValue=""));
-            colnames(ix) <- jamba::makeNames(rep(i, ncol(ix)));
-         }
-         ix;
-      })));
+            ix <- as.character(x[[i]]);
+            if (jamba::igrepHas(split, ix)) {
+               ix <- jamba::rbindList(
+                  jamba::rmNULL(strsplit(as.character(ix), split),
+                     nullValue=""));
+               colnames(ix) <- jamba::makeNames(rep(i, ncol(ix)));
+            }
+            ix;
+         })));
    }
    xnames <- colnames(x);
    x[["found"]] <- rep("", nrow(x));
@@ -173,9 +173,10 @@ freshenGenes <- function
             ido <- (nchar(x[[iname]]) > 0);
          }
          ix <- x[[iname]][ido];
-         ixu <- jamba::rmNA(unique(ix));
+         ixu <- jamba::rmNA(as.character(unique(ix)));
          if (verbose) {
-            jamba::printDebug("ixu:", ixu);
+            jamba::printDebug("ix:", head(ix, 10));
+            jamba::printDebug("ixu:", head(ixu, 10));
             jamba::printDebug("class(itry):", class(itry));
          }
          ivals_l <- AnnotationDbi::mget(ixu,
