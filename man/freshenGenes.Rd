@@ -108,16 +108,22 @@ descriptive gene name, which is provided by \code{"org.Hs.egGENENAME"}.
 }
 \examples{
 if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
-   freshenGenes(c("APOE", "CCR2", "CTG"));
+   freshenGenes(c("APOE", "CCN2", "CTGF"));
+   
+   ## Optionally show the annotation source matched
+   freshenGenes(c("APOE", "CCN2", "CTGF"), include_source=TRUE)
    
    ## Show comma-delimited genes
-   freshenGenes(c("APOE", "CCR2", "CTG", "CCR2,CTG"));
+   freshenGenes(c("APOE", "CCN2", "CTGF", "CCN2,CTGF"));
    
-   ## Comma-delimited accepts the first_try matched
-   freshenGenes(c("APOE", "CCR2", "CTG", "CCR2,APOE"))
-   
-   ## Comma-delimited can return only the first match
-   freshenGenes(c("APOE", "CCR2", "CTG", "CCR2,APOE"), handle_multiple="first_hit")
+   ## Optionally include more than SYMBOL in the output
+   freshenGenes(c("APOE", "CCN2", "CTGF"),
+      finalList=c("SYMBOL", "ALIAS", "GENENAME"))
 }
 
 }
+\seealso{
+Other genejam: 
+\code{\link{get_anno_db}()}
+}
+\concept{genejam}

@@ -32,3 +32,8 @@ In the event the annotation object must be derived using
 \code{AnnotationDbi::revmap()}, then that process is performed, and the
 reverse mapped annotation object is returned.
 }
+\seealso{
+Other genejam: 
+\code{\link{freshenGenes}()}
+}
+\concept{genejam}

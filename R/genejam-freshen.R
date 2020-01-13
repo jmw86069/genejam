@@ -31,6 +31,8 @@
 #' that was matched, then one column for each item in `finalList`,
 #' by default `"SYMBOL"`.
 #' 
+#' @family genejam
+#' 
 #' @param x character vector or `data.frame` with one or most columns
 #'    containing gene symbols.
 #' @param annLib character value indicating the name of the Bioconductor
@@ -79,16 +81,17 @@
 #' 
 #' @examples
 #' if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
-#'    freshenGenes(c("APOE", "CCR2", "CTG"));
+#'    freshenGenes(c("APOE", "CCN2", "CTGF"));
+#'    
+#'    ## Optionally show the annotation source matched
+#'    freshenGenes(c("APOE", "CCN2", "CTGF"), include_source=TRUE)
 #'    
 #'    ## Show comma-delimited genes
-#'    freshenGenes(c("APOE", "CCR2", "CTG", "CCR2,CTG"));
+#'    freshenGenes(c("APOE", "CCN2", "CTGF", "CCN2,CTGF"));
 #'    
-#'    ## Comma-delimited accepts the first_try matched
-#'    freshenGenes(c("APOE", "CCR2", "CTG", "CCR2,APOE"))
-#'    
-#'    ## Comma-delimited can return only the first match
-#'    freshenGenes(c("APOE", "CCR2", "CTG", "CCR2,APOE"), handle_multiple="first_hit")
+#'    ## Optionally include more than SYMBOL in the output
+#'    freshenGenes(c("APOE", "CCN2", "CTGF"),
+#'       finalList=c("SYMBOL", "ALIAS", "GENENAME"))
 #' }
 #' 
 #' @export
@@ -286,6 +289,8 @@ freshenGenes <- function
 #' In the event the annotation object must be derived using
 #' `AnnotationDbi::revmap()`, then that process is performed, and the
 #' reverse mapped annotation object is returned.
+#' 
+#' @family genejam
 #' 
 #' @param x character name of an annotation object, or an annotation
 #'    object itself.

@@ -1,0 +1,9 @@
+destination: docs
+template:
+  params:
+    bootswatch: cosmo
+reference:
+- title: GeneJam core functions
+  desc: Functions that assist with gene annotations
+  contents:
+  - has_concept("genejam")
