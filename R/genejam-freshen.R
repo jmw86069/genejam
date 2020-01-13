@@ -112,14 +112,16 @@ freshenGenes <- function
       stop("Not all packages in annLib are available.");
    }
    if (is.atomic(x)) {
-      x <- data.frame(input=as.character(x));
+      x <- data.frame(input=as.character(x),
+         stringsAsFactors=FALSE);
    }
    if (length(colnames(x)) == 0) {
       colnames(x) <- jamba::makeNames(rep("input", ncol(x)));
    }
    ## Expand columns containing delimited values if necessary
    if (length(split) > 0) {
-      x <- data.frame(do.call(cbind,
+      x <- data.frame(stringsAsFactors=FALSE,
+         do.call(cbind,
          lapply(jamba::nameVector(colnames(x)), function(i){
             ix <- as.character(x[[i]]);
             if (jamba::igrepHas(split, ix)) {

@@ -1,3 +1,10 @@
+# Version 0.0.4.900
+
+## Updates to existing functions
+
+* Another update to resolve cascade `stringsAsFactors` bugs.
+Least favorite default option in R.
+
 # Version 0.0.3.900
 
 ## Updates to existing functions
