@@ -112,7 +112,7 @@ freshenGenes <- function
       stop("Not all packages in annLib are available.");
    }
    if (is.atomic(x)) {
-      x <- data.frame(input=x);
+      x <- data.frame(input=as.character(x));
    }
    if (length(colnames(x)) == 0) {
       colnames(x) <- jamba::makeNames(rep("input", ncol(x)));
