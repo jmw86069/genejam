@@ -1,3 +1,11 @@
+# Version 0.0.5.900
+
+## Updates to existing functions
+
+* `get_anno_db()` was updated to handle reverse-map annotations,
+for example requesting `org.Hs.egALIAS` and deriving it from
+`org.Hs.egALIAS2EG` using `AnnotationDbi::revmap()`.
+
 # Version 0.0.4.900
 
 ## Updates to existing functions

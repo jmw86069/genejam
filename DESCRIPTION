@@ -1,6 +1,6 @@
 Package: genejam
 Title: Gene Jam
-Version: 0.0.4.900
+Version: 0.0.5.900
 Authors@R: person(given="James M.", family="Ward",
    email="jmw86069@gmail.com", role=c("aut", "cre"))
 Description: Gene annotation utility functions.
@@ -16,4 +16,4 @@ BugReports: http://github.com/jmw86069/genejam/issues
 VignetteBuilder: knitr
 Remotes: github::jmw86069/jamba
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2

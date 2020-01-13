@@ -4,11 +4,19 @@
 \alias{freshenGenes}
 \title{Freshen gene annotations using Bioconductor annotation data}
 \usage{
-freshenGenes(x, annLib = c("org.Hs.eg.db"), tryList = c("SYMBOL2EG",
-  "ACCNUM2EG", "ALIAS2EG"), finalList = c("SYMBOL"), split = "[, /]+",
-  sep = ",", handle_multiple = c("first_try", "first_hit", "all"),
-  empty_rule = c("original", "empty"), include_source = FALSE,
-  verbose = FALSE, ...)
+freshenGenes(
+  x,
+  annLib = c("org.Hs.eg.db"),
+  tryList = c("SYMBOL2EG", "ACCNUM2EG", "ALIAS2EG"),
+  finalList = c("SYMBOL"),
+  split = "[, /]+",
+  sep = ",",
+  handle_multiple = c("first_try", "first_hit", "all"),
+  empty_rule = c("original", "empty"),
+  include_source = FALSE,
+  verbose = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{character vector or \code{data.frame} with one or most columns

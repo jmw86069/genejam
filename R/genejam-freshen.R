@@ -315,10 +315,10 @@ get_anno_db <- function
       } else {
          if (length(revmap_suffix) > 0 && nchar(revmap_suffix) > 0) {
             revmap_grep <- paste0(revmap_suffix, "$");
-            if (jamba::igrepHas(revmap_grep, itryname)) {
-               itryname <- gsub(revmap_grep, "", itryname);
+            if (jamba::igrepHas(revmap_grep, x)) {
+               itryname <- gsub(revmap_grep, "", x);
             } else {
-               itryname <- paste0(itryname, revmap_suffix);
+               itryname <- paste0(x, revmap_suffix);
             }
             if (verbose) {
                jamba::printDebug("get_anno_db(): ",
@@ -337,13 +337,14 @@ get_anno_db <- function
       attr(itry, "annoname") <- x;
    } else {
       itrynames <- jamba::provigrep(c("objTarget", "objName"),
-         slotNames(itry));
+         slotNames(x));
       itryname <- paste(
          unlist(lapply(itrynames, function(i){
-            slot(itry, i)
+            slot(x, i)
          })),
          collapse=".");
-      attr(itry, "annoname") <- itryname;
+      attr(x, "annoname") <- itryname;
+      itry <- x;
    }
    return(itry);
 }
