@@ -7,3 +7,7 @@ reference:
   desc: Functions that assist with gene annotations
   contents:
   - has_concept("genejam")
+- title: Jam list functions
+  desc: Functions that operate on list objects
+  contents:
+  - has_concept("jam list functions")

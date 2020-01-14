@@ -77,6 +77,14 @@
 #'    `"original_gene"` matched `"SYMBOL2EG"` in `"org.Hs.eg.db"` there
 #'    will be a column `"found_source"` with value
 #'    `"original_gene.org.Hs.egSYMBOL2EG"`.
+#' @param protect_inline_sep logical indicating whether to
+#'    protect inline characters in `sep`, to prevent them from
+#'    being used to split single values into multiple values.
+#'    For example, `"GENENAME"` returns the full gene name, which
+#'    often contains comma `","` characters. These commas do
+#'    not separate multiple separate values, so they should not be
+#'    used to split a string like `"H4 clustered histone 10, pseudogene"`
+#'    into two strings `"H4 clustered histone 10"` and `"pseudogene"`.
 #' @param verbose logical indicating whether to print verbose output.
 #' 
 #' @examples
@@ -100,11 +108,12 @@ freshenGenes <- function
  annLib=c("org.Hs.eg.db"),
  tryList=c("SYMBOL2EG", "ACCNUM2EG", "ALIAS2EG"),
  finalList=c("SYMBOL"),
- split="[, /]+",
+ split="[ ]*[,/;]+[ ]*",
  sep=",",
  handle_multiple=c("first_try", "first_hit", "all"),
  empty_rule=c("original", "empty"),
  include_source=FALSE,
+ protect_inline_sep=TRUE,
  verbose=FALSE,
  ...)
 {
@@ -146,13 +155,15 @@ freshenGenes <- function
    ## Iterate each column to find a match
    for (itry in tryList) {
       if (verbose) {
-         jamba::printDebug("itry:", itry);
+         jamba::printDebug("freshenGenes(): ",
+            "itry:",
+            itry);
       }
       if ("character" %in% class(itry)) {
          itryname <- paste0(gsub("[.]db$", "", annLib), itry);
-         if (verbose) {
-            jamba::printDebug(itryname);
-         }
+         #if (verbose) {
+         #   jamba::printDebug(itryname);
+         #}
          itry <- get_anno_db(itryname);
          itryname <- attr(itry, "annoname");
       } else {
@@ -161,7 +172,9 @@ freshenGenes <- function
       }
       for (iname in xnames) {
          if (verbose) {
-            jamba::printDebug("   iname:", iname);
+            jamba::printDebug("freshenGenes(): ",
+               "   iname:",
+               iname);
          }
          ifound <- x[["found"]];
          ifound_source <- x[["found_source"]];
@@ -179,7 +192,7 @@ freshenGenes <- function
          }
          ix <- x[[iname]][ido];
          ixu <- jamba::rmNA(as.character(unique(ix)));
-         if (verbose) {
+         if (1 == 2 && verbose) {
             jamba::printDebug("ix:", head(ix, 10));
             jamba::printDebug("ixu:", head(ixu, 10));
             jamba::printDebug("class(itry):", class(itry));
@@ -187,14 +200,29 @@ freshenGenes <- function
          ivals_l <- AnnotationDbi::mget(ixu,
             itry,
             ifnotfound=NA);
+         ## Data cleaning step to protect values which have delimiters
+         if (protect_inline_sep && jamba::igrepHas(sep, unlist(ivals_l))) {
+            ## convert to dummy '!:!'
+            if (verbose) {
+               jamba::printDebug("freshenGenes(): ",
+                  "Converted intermediate '", 
+                  sep, 
+                  "' to '", 
+                  "!:!", 
+                  "'");
+            }
+            ivals_l <- lgsub(sep, "!:!", ivals_l);
+         }
+         
          ivals <- jamba::cPaste(ivals_l,
+            sep=sep,
             na.rm=TRUE);
-         #printDebug("      ivals:", ivals);
+         
          names(ivals) <- ixu;
          ivals <- ivals[!is.na(ivals)];
          ixnew <- ivals[match(ix, names(ivals))];
          ixdo <- (nchar(ixnew) > 0);
-         #iname_tryname <- paste0(iname, ":", itryname);
+         
          iname_tryname <- itryname;
          if (any(c("first_try","all") %in% handle_multiple)) {
             ifound_source[ido][ixdo] <- ifelse(
@@ -217,26 +245,48 @@ freshenGenes <- function
          x[["found_try"]][isnonempty] <- FALSE;
       }
    }
+   
+   ###################################
    ## Remove found_try column
    if ("first_try" %in% handle_multiple) {
       x <- x[,setdiff(colnames(x), "found_try"),drop=FALSE];
    }
-   ## Remove found_source
+   
+   ###################################
+   ## Optionally remove found_source
    if (!include_source) {
       x <- x[,setdiff(colnames(x), "found_source"),drop=FALSE];
    }
    
-   ## Make values unique
+   ###################################
+   ## Make found values unique
    xfoundu <- unique(x[["found"]]);
-   xfounduv <- jamba::cPasteSU(strsplit(xfoundu, sep));
+   xfounduv <- jamba::cPasteSU(strsplit(xfoundu, split),
+      sep=sep);
    x[["found"]] <- xfounduv[match(x[["found"]], xfoundu)];
+   ## Revert protected sep values
+   if (protect_inline_sep && jamba::igrepHas("!:!", x[["found"]])) {
+      ## convert from dummy '!:!' to sep
+      if (verbose) {
+         jamba::printDebug("freshenGenes(): ",
+            "Converted intermediate '", 
+            "!:!", 
+            "' back to '", 
+            sep, 
+            "'");
+      }
+      x[["found"]] <- gsub("!:!", sep, x[["found"]]);
+   }
+   
+   ## make found_source values unique, if they are retained in output
    if (include_source) {
       xfoundsu <- unique(x[["found_source"]]);
-      xfoundsuv <- jamba::cPasteU(strsplit(xfoundsu, sep));
+      xfoundsuv <- jamba::cPasteU(strsplit(xfoundsu, split),
+         sep=sep);
       x[["found_source"]] <- xfoundsuv[match(x[["found_source"]], xfoundsu)];
    }
    
-   ###############################
+   ###################################
    ## finalList
    if (length(finalList) > 0) {
       xnames <- colnames(x);
@@ -258,6 +308,7 @@ freshenGenes <- function
          }
          x1 <- freshenGenes(x[["intermediate"]],
             sep=sep,
+            split=sep,
             handle_multiple=handle_multiple,
             annLib=annLib,
             tryList=i,
@@ -352,4 +403,55 @@ get_anno_db <- function
       itry <- x;
    }
    return(itry);
+}
+
+#' Pattern replacement in a list of character vectors
+#' 
+#' Pattern replacement in a list of character vectors
+#' 
+#' This function is a simple wrapper around `base::gsub()` except
+#' it operates on a list.
+#' 
+#' Note that this function assumes the input data contains vectors
+#' and not embedded list objects.
+#' 
+#' @family jam list functions
+#' 
+#' @param pattern,replacement,ignore.case,perl,fixed,useBytes all
+#'    arguments are passed to `base::gsub()` after `x` is converted
+#'    to a character vector.
+#' @param x `list` object that contains character vectors.
+#' @param ... additional arguments are ignored.
+#' 
+#' @examples
+#' 
+#' x <- list(a=c("A", "B"), b=c("C,D"));
+#' lgsub(",", "!:!", x)
+#' 
+#' @export
+lgsub <- function
+(pattern,
+ replacement,
+ x,
+ ignore.case=FALSE,
+ perl=FALSE,
+ fixed=FALSE,
+ useBytes=FALSE,
+ ...)
+{
+   ## Expand x
+   xlen <- lengths(x);
+   xsplit <- rep(seq_along(x), xlen);
+   xexp <- unname(unlist(x));
+   xexp_new <- gsub(pattern=pattern,
+      replacement=replacement,
+      x=xexp,
+      perl=perl,
+      fixed=fixed,
+      useBytes=useBytes);
+   x_out <- split(xexp_new, xsplit);
+   if (length(names(x)) > 0) {
+      names(x_out) <- names(x);
+   }
+   return(x_out);
 }

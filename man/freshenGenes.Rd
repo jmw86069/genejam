@@ -9,11 +9,12 @@ freshenGenes(
   annLib = c("org.Hs.eg.db"),
   tryList = c("SYMBOL2EG", "ACCNUM2EG", "ALIAS2EG"),
   finalList = c("SYMBOL"),
-  split = "[, /]+",
+  split = "[ ]*[,/;]+[ ]*",
   sep = ",",
   handle_multiple = c("first_try", "first_hit", "all"),
   empty_rule = c("original", "empty"),
   include_source = FALSE,
+  protect_inline_sep = TRUE,
   verbose = FALSE,
   ...
 )
@@ -70,6 +71,15 @@ that shows the colname and source matched. For example, if column
 \code{"original_gene"} matched \code{"SYMBOL2EG"} in \code{"org.Hs.eg.db"} there
 will be a column \code{"found_source"} with value
 \code{"original_gene.org.Hs.egSYMBOL2EG"}.}
+
+\item{protect_inline_sep}{logical indicating whether to
+protect inline characters in \code{sep}, to prevent them from
+being used to split single values into multiple values.
+For example, \code{"GENENAME"} returns the full gene name, which
+often contains comma \code{","} characters. These commas do
+not separate multiple separate values, so they should not be
+used to split a string like \code{"H4 clustered histone 10, pseudogene"}
+into two strings \code{"H4 clustered histone 10"} and \code{"pseudogene"}.}
 
 \item{verbose}{logical indicating whether to print verbose output.}
 }

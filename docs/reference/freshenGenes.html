@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">genejam</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.6.900</span>
       </span>
     </div>
 
@@ -119,11 +119,12 @@
   <span class='kw'>annLib</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"org.Hs.eg.db"</span>),
   <span class='kw'>tryList</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"SYMBOL2EG"</span>, <span class='st'>"ACCNUM2EG"</span>, <span class='st'>"ALIAS2EG"</span>),
   <span class='kw'>finalList</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"SYMBOL"</span>),
-  <span class='kw'>split</span> <span class='kw'>=</span> <span class='st'>"[, /]+"</span>,
+  <span class='kw'>split</span> <span class='kw'>=</span> <span class='st'>"[ ]*[,/;]+[ ]*"</span>,
   <span class='kw'>sep</span> <span class='kw'>=</span> <span class='st'>","</span>,
   <span class='kw'>handle_multiple</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"first_try"</span>, <span class='st'>"first_hit"</span>, <span class='st'>"all"</span>),
   <span class='kw'>empty_rule</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"original"</span>, <span class='st'>"empty"</span>),
   <span class='kw'>include_source</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>protect_inline_sep</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='no'>...</span>
 )</pre>
@@ -198,6 +199,17 @@ that shows the colname and source matched. For example, if column
 <code>"original_gene"</code> matched <code>"SYMBOL2EG"</code> in <code>"org.Hs.eg.db"</code> there
 will be a column <code>"found_source"</code> with value
 <code>"original_gene.org.Hs.egSYMBOL2EG"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>protect_inline_sep</th>
+      <td><p>logical indicating whether to
+protect inline characters in <code>sep</code>, to prevent them from
+being used to split single values into multiple values.
+For example, <code>"GENENAME"</code> returns the full gene name, which
+often contains comma <code>","</code> characters. These commas do
+not separate multiple separate values, so they should not be
+used to split a string like <code>"H4 clustered histone 10, pseudogene"</code>
+into two strings <code>"H4 clustered histone 10"</code> and <code>"pseudogene"</code>.</p></td>
     </tr>
     <tr>
       <th>verbose</th>

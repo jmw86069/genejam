@@ -2,3 +2,4 @@
 
 export(freshenGenes)
 export(get_anno_db)
+export(lgsub)
