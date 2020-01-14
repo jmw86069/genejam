@@ -181,14 +181,14 @@ freshenGenes <- function
          if ("first_hit" %in% handle_multiple) {
             ## input must have characters
             ## must have no found result
-            ido <- (nchar(ifound) == 0 & nchar(x[[iname]]) > 0);
+            ido <- (nchar(jamba::rmNA(naValue="", ifound)) == 0 & nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
          } else if ("first_try" %in% handle_multiple) {
             ## input must have characters
             ## previous try must have no result
-            ido <- (x[["found_try"]] & nchar(x[[iname]]) > 0);
+            ido <- (x[["found_try"]] & nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
          } else {
             ## input must have characters
-            ido <- (nchar(x[[iname]]) > 0);
+            ido <- (nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
          }
          ix <- x[[iname]][ido];
          ixu <- jamba::rmNA(as.character(unique(ix)));
