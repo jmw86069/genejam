@@ -125,7 +125,8 @@ freshenGenes <- function
    }
    if (is.atomic(x)) {
       x <- data.frame(input=as.character(x),
-         stringsAsFactors=FALSE);
+         stringsAsFactors=FALSE,
+         check.names=FALSE);
    }
    if (length(colnames(x)) == 0) {
       colnames(x) <- jamba::makeNames(rep("input", ncol(x)));
@@ -133,6 +134,7 @@ freshenGenes <- function
    ## Expand columns containing delimited values if necessary
    if (length(split) > 0) {
       x <- data.frame(stringsAsFactors=FALSE,
+         check.names=FALSE,
          do.call(cbind,
          lapply(jamba::nameVector(colnames(x)), function(i){
             ix <- as.character(x[[i]]);
