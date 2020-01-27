@@ -89,29 +89,42 @@
 #' 
 #' @examples
 #' if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
-#'    freshenGenes(c("APOE", "CCN2", "CTGF"));
+#'    cat("\nBasic usage\n");
+#'    print(freshenGenes(c("APOE", "CCN2", "CTGF")));
 #'    
 #'    ## Optionally show the annotation source matched
-#'    freshenGenes(c("APOE", "CCN2", "CTGF"), include_source=TRUE)
+#'    cat("\nOptionally show the annotation source matched\n");
+#'    print(freshenGenes(c("APOE", "CCN2", "CTGF"), include_source=TRUE));
 #'    
 #'    ## Show comma-delimited genes
-#'    freshenGenes(c("APOE", "CCN2", "CTGF", "CCN2,CTGF"));
+#'    cat("\nInput genes are comma-delimited\n");
+#'    print(freshenGenes(c("APOE", "CCN2", "CTGF", "CCN2,CTGF")));
 #'    
 #'    ## Optionally include more than SYMBOL in the output
-#'    freshenGenes(c("APOE", "CCN2", "CTGF"),
-#'       finalList=c("SYMBOL", "ALIAS", "GENENAME"))
+#'    cat("\nCustom output to include SYMBOL, ALIAS, GENENAME\n");
+#'    print(freshenGenes(c("APOE", "HIST1H1C"),
+#'       finalList=c("SYMBOL", "ALIAS", "GENENAME")));
+#'       
+#'    ## More advanced, match affymetrix probesets
+#'    if (suppressPackageStartupMessages(require(hgu133plus2.db))) {
+#'       cat("\nAdvanced example including Affymetrix probesets.\n");
+#'       print(freshenGenes(c("227047_x_at","APOE","HIST1H1D"),
+#'          include_source=TRUE,
+#'          tryList=c("hgu133plus2ENTREZID","org.Hs.egSYMBOL2EG","org.Hs.egALIAS2EG"),
+#'          finalList=c("org.Hs.egSYMBOL")))
+#'    }
 #' }
 #' 
 #' @export
 freshenGenes <- function
 (x,
- annLib=c("org.Hs.eg.db"),
+ annLib=c("","org.Hs.eg.db"),
  tryList=c("SYMBOL2EG", "ACCNUM2EG", "ALIAS2EG"),
  finalList=c("SYMBOL"),
  split="[ ]*[,/;]+[ ]*",
  sep=",",
  handle_multiple=c("first_try", "first_hit", "all"),
- empty_rule=c("original", "empty"),
+ empty_rule=c("original", "empty", "na"),
  include_source=FALSE,
  protect_inline_sep=TRUE,
  verbose=FALSE,
@@ -120,7 +133,12 @@ freshenGenes <- function
    ###
    handle_multiple <- match.arg(handle_multiple);
    empty_rule <- match.arg(empty_rule);
-   if (!suppressPackageStartupMessages(require(annLib, character.only=TRUE))) {
+   if (length(annLib) == 0) {
+      annLib <- "";
+   }
+   test_annlib <- setdiff(annLib, c(NA,""));
+   if (length(test_annlib) > 0 && 
+      !suppressPackageStartupMessages(require(test_annlib, character.only=TRUE))) {
       stop("Not all packages in annLib are available.");
    }
    if (is.atomic(x)) {
@@ -155,96 +173,111 @@ freshenGenes <- function
    }
    
    ## Iterate each column to find a match
-   for (itry in tryList) {
+   for (iann in annLib) {
       if (verbose) {
          jamba::printDebug("freshenGenes(): ",
-            "itry:",
-            itry);
+            "iann:",
+            iann);
       }
-      if ("character" %in% class(itry)) {
-         itryname <- paste0(gsub("[.]db$", "", annLib), itry);
-         #if (verbose) {
-         #   jamba::printDebug(itryname);
-         #}
-         itry <- get_anno_db(itryname);
-         itryname <- attr(itry, "annoname");
-      } else {
-         itry <- get_anno_db(itry);
-         itryname <- attr(itry, "annoname");
-      }
-      for (iname in xnames) {
-         if (verbose) {
-            jamba::printDebug("freshenGenes(): ",
-               "   iname:",
-               iname);
-         }
-         ifound <- x[["found"]];
-         ifound_source <- x[["found_source"]];
-         if ("first_hit" %in% handle_multiple) {
-            ## input must have characters
-            ## must have no found result
-            ido <- (nchar(jamba::rmNA(naValue="", ifound)) == 0 & nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
-         } else if ("first_try" %in% handle_multiple) {
-            ## input must have characters
-            ## previous try must have no result
-            ido <- (x[["found_try"]] & nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
-         } else {
-            ## input must have characters
-            ido <- (nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
-         }
-         ix <- x[[iname]][ido];
-         ixu <- jamba::rmNA(as.character(unique(ix)));
-         if (1 == 2 && verbose) {
-            jamba::printDebug("ix:", head(ix, 10));
-            jamba::printDebug("ixu:", head(ixu, 10));
-            jamba::printDebug("class(itry):", class(itry));
-         }
-         ivals_l <- AnnotationDbi::mget(ixu,
-            itry,
-            ifnotfound=NA);
-         ## Data cleaning step to protect values which have delimiters
-         if (protect_inline_sep && jamba::igrepHas(sep, unlist(ivals_l))) {
-            ## convert to dummy '!:!'
+      for (itry in tryList) {
+         if ("character" %in% class(itry) && jamba::igrepHas("[.]db$", iann)) {
+            itryname <- paste0(gsub("[.]db$", "", iann), itry);
             if (verbose) {
                jamba::printDebug("freshenGenes(): ",
-                  "Converted intermediate '", 
-                  sep, 
-                  "' to '", 
-                  "!:!", 
-                  "'");
+                  itryname);
             }
-            ivals_l <- lgsub(sep, "!:!", ivals_l);
-         }
-         
-         ivals <- jamba::cPaste(ivals_l,
-            sep=sep,
-            na.rm=TRUE);
-         
-         names(ivals) <- ixu;
-         ivals <- ivals[!is.na(ivals)];
-         ixnew <- ivals[match(ix, names(ivals))];
-         ixdo <- (nchar(ixnew) > 0);
-         
-         iname_tryname <- itryname;
-         if (any(c("first_try","all") %in% handle_multiple)) {
-            ifound_source[ido][ixdo] <- ifelse(
-               nchar(ifound[ido][ixdo]) == 0,
-               iname_tryname,
-               paste0(ifound_source[ido][ixdo], sep, iname_tryname));
-            ifound[ido][ixdo] <- ifelse(
-               nchar(ifound[ido][ixdo]) == 0,
-               ixnew[ixdo],
-               paste0(ifound[ido][ixdo], sep, ixnew[ixdo]));
+            itry <- get_anno_db(itryname,
+               verbose=verbose,
+               ...);
+            itryname <- attr(itry, "annoname");
          } else {
-            ifound[ido][ixdo] <- ixnew[ixdo];
-            ifound_source[ido][ixdo] <- iname_tryname;
+            if (verbose) {
+               jamba::printDebug("freshenGenes(): ",
+                  "Using annLib entry as-is");
+            }
+            itry <- get_anno_db(itry,
+               verbose=verbose,
+               ...);
+            itryname <- attr(itry, "annoname");
          }
-         x[["found"]] <- ifound;
-         x[["found_source"]] <- ifound_source;
-      }
-      if ("first_try" %in% handle_multiple) {
-         isnonempty <- (nchar(jamba::rmNA(naValue="", x[["found"]])) > 0);
-         x[["found_try"]][isnonempty] <- FALSE;
+         if (length(itry) == 0) {
+            next;
+         }
+         
+         for (iname in xnames) {
+            if (verbose) {
+               jamba::printDebug("freshenGenes(): ",
+                  "   iname:",
+                  iname);
+            }
+            ifound <- x[["found"]];
+            ifound_source <- x[["found_source"]];
+            if ("first_hit" %in% handle_multiple) {
+               ## input must have characters
+               ## must have no found result
+               ido <- (nchar(jamba::rmNA(naValue="", ifound)) == 0 & nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
+            } else if ("first_try" %in% handle_multiple) {
+               ## input must have characters
+               ## previous try must have no result
+               ido <- (x[["found_try"]] & nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
+            } else {
+               ## input must have characters
+               ido <- (nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
+            }
+            ix <- x[[iname]][ido];
+            ixu <- jamba::rmNA(as.character(unique(ix)));
+            if (1 == 2 && verbose) {
+               jamba::printDebug("ix:", head(ix, 10));
+               jamba::printDebug("ixu:", head(ixu, 10));
+               jamba::printDebug("class(itry):", class(itry));
+            }
+            ivals_l <- AnnotationDbi::mget(ixu,
+               itry,
+               ifnotfound=NA);
+            ## Data cleaning step to protect values which have delimiters
+            if (protect_inline_sep && jamba::igrepHas(sep, unlist(ivals_l))) {
+               ## convert to dummy '!:!'
+               if (verbose) {
+                  jamba::printDebug("freshenGenes(): ",
+                     "Converted intermediate '", 
+                     sep, 
+                     "' to '", 
+                     "!:!", 
+                     "'");
+               }
+               ivals_l <- lgsub(sep, "!:!", ivals_l);
+            }
+            
+            ivals <- jamba::cPaste(ivals_l,
+               sep=sep,
+               na.rm=TRUE);
+            
+            names(ivals) <- ixu;
+            ivals <- ivals[!is.na(ivals)];
+            ixnew <- ivals[match(ix, names(ivals))];
+            ixdo <- (nchar(ixnew) > 0);
+            
+            iname_tryname <- itryname;
+            if (any(c("first_try","all") %in% handle_multiple)) {
+               ifound_source[ido][ixdo] <- ifelse(
+                  nchar(ifound[ido][ixdo]) == 0,
+                  iname_tryname,
+                  paste0(ifound_source[ido][ixdo], sep, iname_tryname));
+               ifound[ido][ixdo] <- ifelse(
+                  nchar(ifound[ido][ixdo]) == 0,
+                  ixnew[ixdo],
+                  paste0(ifound[ido][ixdo], sep, ixnew[ixdo]));
+            } else {
+               ifound[ido][ixdo] <- ixnew[ixdo];
+               ifound_source[ido][ixdo] <- iname_tryname;
+            }
+            x[["found"]] <- ifound;
+            x[["found_source"]] <- ifound_source;
+         }
+         if ("first_try" %in% handle_multiple) {
+            isnonempty <- (nchar(jamba::rmNA(naValue="", x[["found"]])) > 0);
+            x[["found_try"]][isnonempty] <- FALSE;
+         }
       }
    }
    
@@ -325,6 +358,10 @@ freshenGenes <- function
          ifinal <- head(finalList, 1);
          isempty <- (nchar(jamba::rmNA(naValue="", x[[ifinal]])) == 0);
          x[[ifinal]][isempty] <- x[[1]][isempty];
+      } else if ("na" %in% empty_rule) {
+         ifinal <- head(finalList, 1);
+         isempty <- (nchar(jamba::rmNA(naValue="", x[[ifinal]])) == 0);
+         x[[ifinal]][isempty] <- NA;
       }
    }
    
@@ -388,7 +425,11 @@ get_anno_db <- function
             if (exists(itryname)) {
                itry <- AnnotationDbi::revmap(get(itryname));
             } else {
-               stop("The annotation data was not found in the search path.");
+               if (verbose) {
+                  jamba::printDebug("get_anno_db(): ",
+                     "Not found on the search path.");
+               }
+               return(NULL);
             }
          }
       }

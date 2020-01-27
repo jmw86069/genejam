@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get annotation database or environment — get_anno_db • genejam</title>
+<title>TODO for genejam • genejam</title>
 
 
 <!-- jquery -->
@@ -29,15 +29,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
-<link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script>
+<link href="pkgdown.css" rel="stylesheet">
+<script src="pkgdown.js"></script>
 
 
 
 
-<meta property="og:title" content="Get annotation database or environment — get_anno_db" />
-<meta property="og:description" content="Get annotation database or environment" />
-<meta name="twitter:card" content="summary" />
+<meta property="og:title" content="TODO for genejam" />
 
 
 
@@ -56,7 +54,7 @@
   </head>
 
   <body>
-    <div class="container template-reference-topic">
+    <div class="container template-title-body">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -68,7 +66,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">genejam</a>
+        <a class="navbar-link" href="index.html">genejam</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8.900</span>
       </span>
     </div>
@@ -76,13 +74,13 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
+  <a href="index.html">
     <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="reference/index.html">Reference</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -103,68 +101,75 @@
       </header>
 
 <div class="row">
-  <div class="col-md-9 contents">
+  <div class="contents col-md-9">
     <div class="page-header">
-    <h1>Get annotation database or environment</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jmw86069/genejam/blob/master/R/genejam-freshen.R'><code>R/genejam-freshen.R</code></a></small>
-    <div class="hidden name"><code>get_anno_db.Rd</code></div>
+      <h1>TODO for genejam</h1>
     </div>
 
-    <div class="ref-description">
-    <p>Get annotation database or environment</p>
-    </div>
+<div id="todo-for-genejam" class="section level1">
 
-    <pre class="usage"><span class='fu'>get_anno_db</span>(<span class='no'>x</span>, <span class='kw'>revmap_suffix</span> <span class='kw'>=</span> <span class='st'>"2EG"</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
+<div id="new-option-handle_multipleeach_best" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-option-handle_multipleeach_best" class="anchor"></a>New option <code>handle_multiple="each_best"</code>
+</h2>
+<p>This option will essentially mimic <code>handle_multiple="first_try"</code> except that when the input data has delimited entries on each line, each delimited entry will be split and handled individually using the <code>"first_try"</code> logic.</p>
+<p>For example, consider an entry with:</p>
+<blockquote>
+<p><code>"APOE,HIST1H2A"</code></p>
+</blockquote>
+<p>The try list is <code>tryList=c("SYMBOL2EG","ACCNUM2EG","ALIAS2EG")</code> which means it will try to match:</p>
+<ul>
+<li>the official gene symbol <code>"SYMBOL2EG"</code> and stop if it finds a match</li>
+<li>then accession numbers <code>"ACCNUM2EG"</code> and stop if it finds a match</li>
+<li>then aliases <code>"ALIAS2EG"</code> and stop if it finds a match.</li>
+</ul>
+<p>The best entry for <code>"APOE"</code> is from <code>"SYMBOL2EG"</code>. The best entry for <code>"HIST1H2A"</code> is from <code>"ALIAS2EG"</code>.</p>
+<p>If we use <code>handle_multiple="first_try"</code> with <code>"APOE,HIST1H2A"</code> the output will be <code>"APOE"</code> – since we stop trying after the first <code>tryLib</code> entry is successful.</p>
+<p>Instead, we want to split <code>"APOE,HIST1H2A"</code> into <code>"APOE"</code> and <code>"HIST1H2A"</code>, then match each separately, then combine the results.</p>
+<p>When each entry contains aliases of the same gene, use <code>handle_multiple="first_try"</code>. When each entry contains different genes, and you want the best current annotation for each gene, use <code>handle_multiple="each_best"</code>.</p>
+<div id="basic-workflow" class="section level3">
+<h3 class="hasAnchor">
+<a href="#basic-workflow" class="anchor"></a>Basic workflow</h3>
+<p>The general guidance is to use only one input column at a time.</p>
+<pre><code><a href="https://rdrr.io/r/base/library.html">require(org.Hs.eg.db);
+## Define an interesting input list
+input &lt;- c("APOE,HIST1H1C,HIST1H1D,,HIST1H2A", "HIST1H2A","APOA", "APOA,LPA,HIST1H1C");
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>x</th>
-      <td><p>character name of an annotation object, or an annotation
-object itself.</p></td>
-    </tr>
-    <tr>
-      <th>revmap_suffix</th>
-      <td><p>character string indicting the expected suffix
-that can be used to create reverse-mapped annotation data, for
-example the suffix <code>"2EG"</code> is used to indicate that annotation
-returns Entrez gene. When annotation does not contain this suffix,
-the annotation is reverse-mapped using <code><a href='https://rdrr.io/pkg/AnnotationDbi/man/Bimap-direction.html'>AnnotationDbi::revmap()</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>verbose</th>
-      <td><p>logical indicating whetheer to print verbose output.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>additional arguments are ignored.</p></td>
-    </tr>
-    </table>
+## Split the input by delimiter
+taller_list &lt;- strsplit(input, ",");
+## Make a vector and associated factor to split back into a list
+taller_vector &lt;- unlist(taller_list);
+taller_factor &lt;- rep(factor(seq_along(taller_list)),
+   lengths(taller_list));
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+## run freshenGenes()
+taller_freshened &lt;- freshenGenes(taller_vector,
+   empty_rule="na",
+   handle_multiple="first_try");
+taller_freshened;
 
-    <p>This function is a simple wrapper function that takes either an
-annotation data name, for example from the <code>AnnotationDbi</code> package,
-or an annotation object, and returns the annotation object.</p>
-<p>In the event the annotation object must be derived using
-<code><a href='https://rdrr.io/pkg/AnnotationDbi/man/Bimap-direction.html'>AnnotationDbi::revmap()</a></code>, then that process is performed, and the
-reverse mapped annotation object is returned.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+## optionally review any changes
+changed_rows &lt;- subset(unique(taller_freshened), jamba::rmNA(naValue="",input) != jamba::rmNA(naValue="",SYMBOL));
+changed_rows;
 
-    <div class='dont-index'><p>Other genejam: <code><a href='freshenGenes.html'>freshenGenes</a></code></p></div>
+## Review changes entries in more detail
+jamba::mixedSortDF(byCols="SYMBOL", 
+   subset(unique(taller_freshened), 
+      SYMBOL %in% jamba::rmNA(changed_rows$SYMBOL)))
 
-  </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#see-also">See also</a></li>
-    </ul>
+## Split back into the original vector
+taller_freshened_split &lt;- split(taller_freshened$SYMBOL, taller_factor);
 
-  </div>
+## comma-delimit using only unique entries
+jamba::cPasteU(taller_freshened_split, na.rm=TRUE);</a></code></pre>
 </div>
+</div>
+</div>
+
+  </div>
+
+</div>
+
 
 
       <footer>

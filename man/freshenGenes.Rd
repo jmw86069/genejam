@@ -4,20 +4,12 @@
 \alias{freshenGenes}
 \title{Freshen gene annotations using Bioconductor annotation data}
 \usage{
-freshenGenes(
-  x,
-  annLib = c("org.Hs.eg.db"),
+freshenGenes(x, annLib = c("", "org.Hs.eg.db"),
   tryList = c("SYMBOL2EG", "ACCNUM2EG", "ALIAS2EG"),
-  finalList = c("SYMBOL"),
-  split = "[ ]*[,/;]+[ ]*",
-  sep = ",",
+  finalList = c("SYMBOL"), split = "[ ]*[,/;]+[ ]*", sep = ",",
   handle_multiple = c("first_try", "first_hit", "all"),
-  empty_rule = c("original", "empty"),
-  include_source = FALSE,
-  protect_inline_sep = TRUE,
-  verbose = FALSE,
-  ...
-)
+  empty_rule = c("original", "empty", "na"), include_source = FALSE,
+  protect_inline_sep = TRUE, verbose = FALSE, ...)
 }
 \arguments{
 \item{x}{character vector or \code{data.frame} with one or most columns
@@ -118,22 +110,34 @@ descriptive gene name, which is provided by \code{"org.Hs.egGENENAME"}.
 }
 \examples{
 if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
-   freshenGenes(c("APOE", "CCN2", "CTGF"));
+   cat("\\nBasic usage\\n");
+   print(freshenGenes(c("APOE", "CCN2", "CTGF")));
    
    ## Optionally show the annotation source matched
-   freshenGenes(c("APOE", "CCN2", "CTGF"), include_source=TRUE)
+   cat("\\nOptionally show the annotation source matched\\n");
+   print(freshenGenes(c("APOE", "CCN2", "CTGF"), include_source=TRUE));
    
    ## Show comma-delimited genes
-   freshenGenes(c("APOE", "CCN2", "CTGF", "CCN2,CTGF"));
+   cat("\\nInput genes are comma-delimited\\n");
+   print(freshenGenes(c("APOE", "CCN2", "CTGF", "CCN2,CTGF")));
    
    ## Optionally include more than SYMBOL in the output
-   freshenGenes(c("APOE", "CCN2", "CTGF"),
-      finalList=c("SYMBOL", "ALIAS", "GENENAME"))
+   cat("\\nCustom output to include SYMBOL, ALIAS, GENENAME\\n");
+   print(freshenGenes(c("APOE", "HIST1H1C"),
+      finalList=c("SYMBOL", "ALIAS", "GENENAME")));
+      
+   ## More advanced, match affymetrix probesets
+   if (suppressPackageStartupMessages(require(hgu133plus2.db))) {
+      cat("\\nAdvanced example including Affymetrix probesets.\\n");
+      print(freshenGenes(c("227047_x_at","APOE","HIST1H1D"),
+         include_source=TRUE,
+         tryList=c("hgu133plus2ENTREZID","org.Hs.egSYMBOL2EG","org.Hs.egALIAS2EG"),
+         finalList=c("org.Hs.egSYMBOL")))
+   }
 }
 
 }
 \seealso{
-Other genejam: 
-\code{\link{get_anno_db}()}
+Other genejam: \code{\link{get_anno_db}}
 }
 \concept{genejam}

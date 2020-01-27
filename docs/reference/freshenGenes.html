@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">genejam</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.7.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8.900</span>
       </span>
     </div>
 
@@ -114,20 +114,12 @@
     <p>Freshen gene annotations using Bioconductor annotation data</p>
     </div>
 
-    <pre class="usage"><span class='fu'>freshenGenes</span>(
-  <span class='no'>x</span>,
-  <span class='kw'>annLib</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"org.Hs.eg.db"</span>),
+    <pre class="usage"><span class='fu'>freshenGenes</span>(<span class='no'>x</span>, <span class='kw'>annLib</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>""</span>, <span class='st'>"org.Hs.eg.db"</span>),
   <span class='kw'>tryList</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"SYMBOL2EG"</span>, <span class='st'>"ACCNUM2EG"</span>, <span class='st'>"ALIAS2EG"</span>),
-  <span class='kw'>finalList</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"SYMBOL"</span>),
-  <span class='kw'>split</span> <span class='kw'>=</span> <span class='st'>"[ ]*[,/;]+[ ]*"</span>,
-  <span class='kw'>sep</span> <span class='kw'>=</span> <span class='st'>","</span>,
+  <span class='kw'>finalList</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"SYMBOL"</span>), <span class='kw'>split</span> <span class='kw'>=</span> <span class='st'>"[ ]*[,/;]+[ ]*"</span>, <span class='kw'>sep</span> <span class='kw'>=</span> <span class='st'>","</span>,
   <span class='kw'>handle_multiple</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"first_try"</span>, <span class='st'>"first_hit"</span>, <span class='st'>"all"</span>),
-  <span class='kw'>empty_rule</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"original"</span>, <span class='st'>"empty"</span>),
-  <span class='kw'>include_source</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>protect_inline_sep</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='no'>...</span>
-)</pre>
+  <span class='kw'>empty_rule</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"original"</span>, <span class='st'>"empty"</span>, <span class='st'>"na"</span>), <span class='kw'>include_source</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>protect_inline_sep</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -247,30 +239,67 @@ descriptive gene name, which is provided by <code>"org.Hs.egGENENAME"</code>.</p
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other genejam: 
-<code><a href='get_anno_db.html'>get_anno_db</a>()</code></p></div>
+    <div class='dont-index'><p>Other genejam: <code><a href='get_anno_db.html'>get_anno_db</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/message.html'>suppressPackageStartupMessages</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='no'>org.Hs.eg.db</span>))) {
-   <span class='fu'>freshenGenes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"APOE"</span>, <span class='st'>"CCN2"</span>, <span class='st'>"CTGF"</span>));
+   <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span>(<span class='st'>"\nBasic usage\n"</span>);
+   <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'>freshenGenes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"APOE"</span>, <span class='st'>"CCN2"</span>, <span class='st'>"CTGF"</span>)));
 
    <span class='co'>## Optionally show the annotation source matched</span>
-   <span class='fu'>freshenGenes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"APOE"</span>, <span class='st'>"CCN2"</span>, <span class='st'>"CTGF"</span>), <span class='kw'>include_source</span><span class='kw'>=</span><span class='fl'>TRUE</span>)
+   <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span>(<span class='st'>"\nOptionally show the annotation source matched\n"</span>);
+   <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'>freshenGenes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"APOE"</span>, <span class='st'>"CCN2"</span>, <span class='st'>"CTGF"</span>), <span class='kw'>include_source</span><span class='kw'>=</span><span class='fl'>TRUE</span>));
 
    <span class='co'>## Show comma-delimited genes</span>
-   <span class='fu'>freshenGenes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"APOE"</span>, <span class='st'>"CCN2"</span>, <span class='st'>"CTGF"</span>, <span class='st'>"CCN2,CTGF"</span>));
+   <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span>(<span class='st'>"\nInput genes are comma-delimited\n"</span>);
+   <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'>freshenGenes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"APOE"</span>, <span class='st'>"CCN2"</span>, <span class='st'>"CTGF"</span>, <span class='st'>"CCN2,CTGF"</span>)));
 
    <span class='co'>## Optionally include more than SYMBOL in the output</span>
-   <span class='fu'>freshenGenes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"APOE"</span>, <span class='st'>"CCN2"</span>, <span class='st'>"CTGF"</span>),
-      <span class='kw'>finalList</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"SYMBOL"</span>, <span class='st'>"ALIAS"</span>, <span class='st'>"GENENAME"</span>))
-}</div><div class='output co'>#&gt;   input intermediate SYMBOL                           ALIAS
-#&gt; 1  APOE          348   APOE AD2,APO-E,APOE,ApoE4,LDLCQ5,LPG
-#&gt; 2  CCN2         1490   CCN2     CCN2,CTGF,HCS24,IGFBP8,NOV2
-#&gt; 3  CTGF         1490   CCN2     CCN2,CTGF,HCS24,IGFBP8,NOV2
-#&gt;                                  GENENAME
-#&gt; 1                        apolipoprotein E
-#&gt; 2 cellular communication network factor 2
-#&gt; 3 cellular communication network factor 2</div><div class='input'>
+   <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span>(<span class='st'>"\nCustom output to include SYMBOL, ALIAS, GENENAME\n"</span>);
+   <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'>freshenGenes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"APOE"</span>, <span class='st'>"HIST1H1C"</span>),
+      <span class='kw'>finalList</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"SYMBOL"</span>, <span class='st'>"ALIAS"</span>, <span class='st'>"GENENAME"</span>)));
+
+   <span class='co'>## More advanced, match affymetrix probesets</span>
+   <span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/message.html'>suppressPackageStartupMessages</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='no'>hgu133plus2.db</span>))) {
+      <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span>(<span class='st'>"\nAdvanced example including Affymetrix probesets.\n"</span>);
+      <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'>freshenGenes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"227047_x_at"</span>,<span class='st'>"APOE"</span>,<span class='st'>"HIST1H1D"</span>),
+         <span class='kw'>include_source</span><span class='kw'>=</span><span class='fl'>TRUE</span>,
+         <span class='kw'>tryList</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"hgu133plus2ENTREZID"</span>,<span class='st'>"org.Hs.egSYMBOL2EG"</span>,<span class='st'>"org.Hs.egALIAS2EG"</span>),
+         <span class='kw'>finalList</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"org.Hs.egSYMBOL"</span>)))
+   }
+}</div><div class='output co'>#&gt; 
+#&gt; Basic usage
+#&gt;   input intermediate SYMBOL
+#&gt; 1  APOE          348   APOE
+#&gt; 2  CCN2         1490   CCN2
+#&gt; 3  CTGF         1490   CCN2
+#&gt; 
+#&gt; Optionally show the annotation source matched
+#&gt;   input intermediate intermediate_source SYMBOL
+#&gt; 1  APOE          348  org.Hs.egSYMBOL2EG   APOE
+#&gt; 2  CCN2         1490  org.Hs.egSYMBOL2EG   CCN2
+#&gt; 3  CTGF         1490   org.Hs.egALIAS2EG   CCN2
+#&gt; 
+#&gt; Input genes are comma-delimited
+#&gt;   input_v1 input_v2 intermediate SYMBOL
+#&gt; 1     APOE                   348   APOE
+#&gt; 2     CCN2                  1490   CCN2
+#&gt; 3     CTGF                  1490   CCN2
+#&gt; 4     CCN2     CTGF         1490   CCN2
+#&gt; 
+#&gt; Custom output to include SYMBOL, ALIAS, GENENAME
+#&gt;      input intermediate SYMBOL                             ALIAS
+#&gt; 1     APOE          348   APOE   AD2,APO-E,ApoE4,APOE,LDLCQ5,LPG
+#&gt; 2 HIST1H1C         3006   H1-2 H1-2,H1.2,H1C,H1F2,H1s-1,HIST1H1C
+#&gt;                              GENENAME
+#&gt; 1                    apolipoprotein E
+#&gt; 2 H1.2 linker histone, cluster member
+#&gt; 
+#&gt; Advanced example including Affymetrix probesets.
+#&gt;         input intermediate intermediate_source org.Hs.egSYMBOL
+#&gt; 1 227047_x_at        57659 hgu133plus2ENTREZID           ZBTB4
+#&gt; 2        APOE          348  org.Hs.egSYMBOL2EG            APOE
+#&gt; 3    HIST1H1D         3007   org.Hs.egALIAS2EG            H1-3</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

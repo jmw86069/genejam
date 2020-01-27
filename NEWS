@@ -1,3 +1,29 @@
+# Version 0.0.8.900
+
+The next version will have `handle_multiple="best_each"` which
+will find the best match for each entry in a set of delimited
+gene symbols. Most useful for something like pathway enrichment
+results, where the goal is to retain all possible genes, yet
+each gene may require a different type of annotation to
+find a match. See `TODO.md` for details.
+
+## Updates to existing functions
+
+* `freshenGenes()` includes a new example showing how to recognize
+Affymetrix probesets by using a custom search library.
+* `freshenGenes()` handles multiple annotation libraries,
+mostly in the form of fully described annotation names,
+such as `"org.Hs.egSYMBOL"` and `"hgu133plus2ENTREZID"`.
+* `freshenGenes()` new option `empty_rule="na"` which will
+replace empty entries with `NA`. Other options `empty_rule="blank"`
+replaces with `""`, and `empty_rule="original"` replaces empty
+entries in the first output column with the original entry in
+the first input column.
+* `get_anno_db()` now returns``NULL` when an annotation is
+not found, instead of throwing an error. This change allows
+the calling function to skip missing annotation gracefully
+without using `tryCatch()` to catch the error.
+
 # Version 0.0.7.900
 
 ## Updates to existing functions
