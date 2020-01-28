@@ -1,3 +1,15 @@
+# Version 0.0.9.900
+
+## Changes to existing functions
+
+* `freshenGenes()` new argument `handle_multiple="best_each"` which
+returns the best first try for each delimited entry in each input
+row. For example `c("APOE","APOA")` will match `"APOE"` as an
+authoritatice gene symbol, but `"APOA"` is matched as an alias
+to the new gene symbol `"LPA"`. The output will be `"APOA,LPA"`.
+Note that output will contain unique entries delimited, but they
+will not be sorted.
+
 # Version 0.0.8.900
 
 The next version will have `handle_multiple="best_each"` which

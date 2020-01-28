@@ -123,7 +123,7 @@ freshenGenes <- function
  finalList=c("SYMBOL"),
  split="[ ]*[,/;]+[ ]*",
  sep=",",
- handle_multiple=c("first_try", "first_hit", "all"),
+ handle_multiple=c("first_try", "first_hit", "all", "best_each"),
  empty_rule=c("original", "empty", "na"),
  include_source=FALSE,
  protect_inline_sep=TRUE,
@@ -149,8 +149,68 @@ freshenGenes <- function
    if (length(colnames(x)) == 0) {
       colnames(x) <- jamba::makeNames(rep("input", ncol(x)));
    }
+   ## handle_multiple="best_each"
+   if ("best_each" %in% handle_multiple) {
+      if (verbose) {
+         jamba::printDebug("freshenGenes(): ",
+            "handle_multiple:",
+            handle_multiple);
+      }
+      if (ncol(x) == 1) {
+         ## Check for delimited values
+         if (length(split) > 0 && jamba::igrepHas(split, x[[1]])) {
+            ## Split the input by delimiter
+            taller_list <- strsplit(x[[1]], split);
+            ## Make a vector and associated factor to split back into a list
+            taller_vector <- unlist(taller_list);
+            taller_factor <- rep(factor(seq_along(taller_list)),
+               lengths(taller_list));
+         } else {
+            taller_vector <- x[[1]];
+            taller_factor <- NULL;
+         }
+         ## run freshenGenes()
+         ## empty_rule="na" here so blank entries will get dropped
+         ## then we can replace as needed later
+         taller_freshened <- freshenGenes(x=taller_vector,
+            annLib=annLib,
+            tryList=tryList,
+            finalList=finalList,
+            split=split,
+            sep=sep,
+            handle_multiple="first_try",
+            empty_rule="na",
+            include_source=include_source,
+            protect_inline_sep=protect_inline_sep,
+            verbose=FALSE);
+         ## Split back into the original vector
+         if (length(taller_factor) == 0) {
+            return(taller_freshened);
+         }
+         final_colnames <- jamba::provigrep(c(finalList,
+            "^intermediate",
+            "_source$"),
+            colnames(taller_freshened));
+         final_colnames <- colnames(taller_freshened);
+         x_new <- do.call(cbind, lapply(jamba::nameVector(final_colnames), function(i){
+            taller_freshened_split <- split(taller_freshened[[i]],
+               taller_factor);
+            ## comma-delimit using only unique entries
+            idf <- data.frame(check.names=FALSE,
+               stringsAsFactors=FALSE,
+               output=jamba::cPasteU(taller_freshened_split,
+                  sep=sep,
+                  na.rm=TRUE));
+            colnames(idf) <- i;
+            idf;
+            
+         }));
+         return(x_new);
+      }
+   }
+   
    ## Expand columns containing delimited values if necessary
-   if (length(split) > 0) {
+   if (length(split) > 0 && nchar(split) > 0) {
       x <- data.frame(stringsAsFactors=FALSE,
          check.names=FALSE,
          do.call(cbind,
@@ -215,22 +275,19 @@ freshenGenes <- function
             if ("first_hit" %in% handle_multiple) {
                ## input must have characters
                ## must have no found result
-               ido <- (nchar(jamba::rmNA(naValue="", ifound)) == 0 & nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
+               ido <- (nchar(jamba::rmNA(naValue="", ifound)) == 0 &
+                     nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
             } else if ("first_try" %in% handle_multiple) {
                ## input must have characters
                ## previous try must have no result
-               ido <- (x[["found_try"]] & nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
+               ido <- (x[["found_try"]] &
+                     nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
             } else {
                ## input must have characters
                ido <- (nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
             }
             ix <- x[[iname]][ido];
             ixu <- jamba::rmNA(as.character(unique(ix)));
-            if (1 == 2 && verbose) {
-               jamba::printDebug("ix:", head(ix, 10));
-               jamba::printDebug("ixu:", head(ixu, 10));
-               jamba::printDebug("class(itry):", class(itry));
-            }
             ivals_l <- AnnotationDbi::mget(ixu,
                itry,
                ifnotfound=NA);
@@ -296,8 +353,12 @@ freshenGenes <- function
    ###################################
    ## Make found values unique
    xfoundu <- unique(x[["found"]]);
-   xfounduv <- jamba::cPasteSU(strsplit(xfoundu, split),
-      sep=sep);
+   if (length(split) > 0 && nchar(split) > 0) {
+      xfounduv <- jamba::cPasteSU(strsplit(xfoundu, split),
+         sep=sep);
+   } else {
+      xfounduv <- xfoundu;
+   }
    x[["found"]] <- xfounduv[match(x[["found"]], xfoundu)];
    ## Revert protected sep values
    if (protect_inline_sep && jamba::igrepHas("!:!", x[["found"]])) {
@@ -316,8 +377,12 @@ freshenGenes <- function
    ## make found_source values unique, if they are retained in output
    if (include_source) {
       xfoundsu <- unique(x[["found_source"]]);
-      xfoundsuv <- jamba::cPasteU(strsplit(xfoundsu, split),
-         sep=sep);
+      if (length(split) > 0 && nchar(split) > 0) {
+         xfoundsuv <- jamba::cPasteU(strsplit(xfoundsu, split),
+            sep=sep);
+      } else {
+         xfoundsuv <- xfoundsu;
+      }
       x[["found_source"]] <- xfoundsuv[match(x[["found_source"]], xfoundsu)];
    }
    

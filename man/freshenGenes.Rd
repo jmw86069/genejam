@@ -7,7 +7,7 @@
 freshenGenes(x, annLib = c("", "org.Hs.eg.db"),
   tryList = c("SYMBOL2EG", "ACCNUM2EG", "ALIAS2EG"),
   finalList = c("SYMBOL"), split = "[ ]*[,/;]+[ ]*", sep = ",",
-  handle_multiple = c("first_try", "first_hit", "all"),
+  handle_multiple = c("first_try", "first_hit", "all", "best_each"),
   empty_rule = c("original", "empty", "na"), include_source = FALSE,
   protect_inline_sep = TRUE, verbose = FALSE, ...)
 }
