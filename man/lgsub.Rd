@@ -4,8 +4,16 @@
 \alias{lgsub}
 \title{Pattern replacement in a list of character vectors}
 \usage{
-lgsub(pattern, replacement, x, ignore.case = FALSE, perl = FALSE,
-  fixed = FALSE, useBytes = FALSE, ...)
+lgsub(
+  pattern,
+  replacement,
+  x,
+  ignore.case = FALSE,
+  perl = FALSE,
+  fixed = FALSE,
+  useBytes = FALSE,
+  ...
+)
 }
 \arguments{
 \item{pattern, replacement, ignore.case, perl, fixed, useBytes}{all

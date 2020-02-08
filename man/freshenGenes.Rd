@@ -4,12 +4,20 @@
 \alias{freshenGenes}
 \title{Freshen gene annotations using Bioconductor annotation data}
 \usage{
-freshenGenes(x, annLib = c("", "org.Hs.eg.db"),
+freshenGenes(
+  x,
+  annLib = c("", "org.Hs.eg.db"),
   tryList = c("SYMBOL2EG", "ACCNUM2EG", "ALIAS2EG"),
-  finalList = c("SYMBOL"), split = "[ ]*[,/;]+[ ]*", sep = ",",
+  finalList = c("SYMBOL"),
+  split = "[ ]*[,/;]+[ ]*",
+  sep = ",",
   handle_multiple = c("first_try", "first_hit", "all", "best_each"),
-  empty_rule = c("original", "empty", "na"), include_source = FALSE,
-  protect_inline_sep = TRUE, verbose = FALSE, ...)
+  empty_rule = c("original", "empty", "na"),
+  include_source = FALSE,
+  protect_inline_sep = TRUE,
+  verbose = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{character vector or \code{data.frame} with one or most columns
@@ -36,10 +44,14 @@ When \code{finalList} contains multiple values, each value is returned
 in the output. For example, \code{finalList=c("SYMBOL","GENENAME")} will
 return a column \code{"SYMBOL"} and a column \code{"GENENAME"}.}
 
-\item{sep}{character value used to separate delimited values in \code{x}.
-For example when \code{sep=","} then comma-delimited values will be split
-into separate columns, and each column can be used in the gene
-annotation update. See \code{handle_multiple}.}
+\item{split}{character value used to separate delimited values in \code{x}
+by the function \code{base::strsplit()}. The default will split values
+separated by comma \verb{,} semicolon \verb{;} or forward slash \code{/}, and will
+trim whitespace before and after these delimiters.}
+
+\item{sep}{character value used to concatenate multiple entries in
+the same field. The default \code{sep=","} will comma-delimit multiple
+entries in the same field.}
 
 \item{handle_multiple}{character value indicating how to handle multiple
 values: \code{"first_hit"} will query each column of \code{x} until it finds the
@@ -89,46 +101,64 @@ This function takes a vector or \code{data.frame} of gene symbols,
 and uses Bioconductor annotation methods to find the most current
 official gene symbol.
 
-The function can also be customized to return
-additional annotation, or custom annotation.
-
-The annotation process is intended to run in two steps:
+The annotation process runs in two basic steps:
 \enumerate{
-\item Convert the input gene symbol to the recognized Entrez gene ID,
-usually using something like \code{"org.Hs.egSYMBOL2EG"} which returns
-a character string with Entrez gene identifier. When the
-gene symbol is not recognized, the backup plan is to use gene
-aliases, accession numbers, or other relevant annotations to
-find the current official gene. However, these steps are not
-as trusted as using the \code{"SYMBOL2EG"} approach, so that step
-is attempted first.
-\item Convert the Entrez gene identifier to the official Entrez gene
-symbol, usually using something like \code{"org.Hs.egSYMBOL"}. This
-step is also a convenient time to include things like the
-descriptive gene name, which is provided by \code{"org.Hs.egGENENAME"}.
+\item \strong{Convert the input gene to Entrez gene ID}.
+\item \strong{Convert Entrez gene ID to official gene symbol}.
+}
+\subsection{Step 1. Convert to Entrez gene ID}{
+
+The first step uses an ordered list of annotations,
+with the assumption that the first match is usually the best,
+and most specific. By default, the order is:
+\itemize{
+\item \code{"org.Hs.egSYMBOL2EG"} -- almost always 1-to-1 match
+\item \code{"org.Hs.egACCNUM2EG"} -- mostly a 1-to-1 match
+\item \code{"org.Hs.egALIAS2EG"} -- sometimes a 1-to-1 match, sometimes 1-to-many
+}
+
+When multiple Entrez gene ID values are matched, they are all
+retained. See argument \code{handle_multiple} for custom options.
+}
+
+\subsection{Step 2. Use Entrez gene ID to return official annotation}{
+
+The second step converts the Entrez gene ID (or multiple IDs)
+to the official gene symbol, by default using \code{"org.Hs.egSYMBOL"}.
+
+The second step may optionally include multiple annotation types,
+each of which will be returned. Some common examples:
+\itemize{
+\item \code{"org.Hs.egSYMBOL"} -- official Entrez gene symbol
+\item \code{"org.Hs.egALIAS"} -- set of recognized aliases for an Entrez gene.
+\item \code{"org.Hs.egGENENAME"} -- official Entrez long gene name
+}
+
+For each step, the annotation matched can be returned, as an audit
+trail to see which annotation was available for each input entry.
 }
 }
 \examples{
 if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
-   cat("\\nBasic usage\\n");
+   cat("\nBasic usage\n");
    print(freshenGenes(c("APOE", "CCN2", "CTGF")));
    
    ## Optionally show the annotation source matched
-   cat("\\nOptionally show the annotation source matched\\n");
+   cat("\nOptionally show the annotation source matched\n");
    print(freshenGenes(c("APOE", "CCN2", "CTGF"), include_source=TRUE));
    
    ## Show comma-delimited genes
-   cat("\\nInput genes are comma-delimited\\n");
+   cat("\nInput genes are comma-delimited\n");
    print(freshenGenes(c("APOE", "CCN2", "CTGF", "CCN2,CTGF")));
    
    ## Optionally include more than SYMBOL in the output
-   cat("\\nCustom output to include SYMBOL, ALIAS, GENENAME\\n");
+   cat("\nCustom output to include SYMBOL, ALIAS, GENENAME\n");
    print(freshenGenes(c("APOE", "HIST1H1C"),
       finalList=c("SYMBOL", "ALIAS", "GENENAME")));
       
    ## More advanced, match affymetrix probesets
    if (suppressPackageStartupMessages(require(hgu133plus2.db))) {
-      cat("\\nAdvanced example including Affymetrix probesets.\\n");
+      cat("\nAdvanced example including Affymetrix probesets.\n");
       print(freshenGenes(c("227047_x_at","APOE","HIST1H1D"),
          include_source=TRUE,
          tryList=c("hgu133plus2ENTREZID","org.Hs.egSYMBOL2EG","org.Hs.egALIAS2EG"),
@@ -138,6 +168,7 @@ if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
 
 }
 \seealso{
-Other genejam: \code{\link{get_anno_db}}
+Other genejam: 
+\code{\link{get_anno_db}()}
 }
 \concept{genejam}

@@ -8,23 +8,38 @@
 #' and uses Bioconductor annotation methods to find the most current
 #' official gene symbol.
 #' 
-#' The function can also be customized to return
-#' additional annotation, or custom annotation.
-#' 
-#' The annotation process is intended to run in two steps:
-#' 
-#' 1. Convert the input gene symbol to the recognized Entrez gene ID,
-#' usually using something like `"org.Hs.egSYMBOL2EG"` which returns
-#' a character string with Entrez gene identifier. When the
-#' gene symbol is not recognized, the backup plan is to use gene
-#' aliases, accession numbers, or other relevant annotations to
-#' find the current official gene. However, these steps are not
-#' as trusted as using the `"SYMBOL2EG"` approach, so that step
-#' is attempted first.
-#' 2. Convert the Entrez gene identifier to the official Entrez gene
-#' symbol, usually using something like `"org.Hs.egSYMBOL"`. This
-#' step is also a convenient time to include things like the
-#' descriptive gene name, which is provided by `"org.Hs.egGENENAME"`.
+#' The annotation process runs in two basic steps:
+#'
+#' 1. **Convert the input gene to Entrez gene ID**.
+#' 2. **Convert Entrez gene ID to official gene symbol**.
+#'
+#' ## Step 1. Convert to Entrez gene ID
+#'
+#' The first step uses an ordered list of annotations,
+#' with the assumption that the first match is usually the best,
+#' and most specific. By default, the order is:
+#'
+#' * `"org.Hs.egSYMBOL2EG"` -- almost always 1-to-1 match
+#' * `"org.Hs.egACCNUM2EG"` -- mostly a 1-to-1 match
+#' * `"org.Hs.egALIAS2EG"` -- sometimes a 1-to-1 match, sometimes 1-to-many
+#'
+#' When multiple Entrez gene ID values are matched, they are all
+#' retained. See argument `handle_multiple` for custom options.
+#'
+#' ## Step 2. Use Entrez gene ID to return official annotation
+#'
+#' The second step converts the Entrez gene ID (or multiple IDs)
+#' to the official gene symbol, by default using `"org.Hs.egSYMBOL"`.
+#'
+#' The second step may optionally include multiple annotation types,
+#' each of which will be returned. Some common examples:
+#'
+#' * `"org.Hs.egSYMBOL"` -- official Entrez gene symbol
+#' * `"org.Hs.egALIAS"` -- set of recognized aliases for an Entrez gene.
+#' * `"org.Hs.egGENENAME"` -- official Entrez long gene name
+#'
+#' For each step, the annotation matched can be returned, as an audit
+#' trail to see which annotation was available for each input entry.
 #' 
 #' @return `data.frame` with one or more columns indicating the input
 #' data, then a column `"intermediate"` containing the Entrez gene ID
@@ -53,10 +68,13 @@
 #'    When `finalList` contains multiple values, each value is returned
 #'    in the output. For example, `finalList=c("SYMBOL","GENENAME")` will
 #'    return a column `"SYMBOL"` and a column `"GENENAME"`.
-#' @param sep character value used to separate delimited values in `x`.
-#'    For example when `sep=","` then comma-delimited values will be split
-#'    into separate columns, and each column can be used in the gene
-#'    annotation update. See `handle_multiple`.
+#' @param split character value used to separate delimited values in `x`
+#'    by the function `base::strsplit()`. The default will split values
+#'    separated by comma `,` semicolon `;` or forward slash `/`, and will
+#'    trim whitespace before and after these delimiters.
+#' @param sep character value used to concatenate multiple entries in
+#'    the same field. The default `sep=","` will comma-delimit multiple
+#'    entries in the same field.
 #' @param handle_multiple character value indicating how to handle multiple
 #'    values: `"first_hit"` will query each column of `x` until it finds the
 #'    first possible returning match, and will ignore all subsequent possible

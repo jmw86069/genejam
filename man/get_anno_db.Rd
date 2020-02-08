@@ -33,6 +33,7 @@ In the event the annotation object must be derived using
 reverse mapped annotation object is returned.
 }
 \seealso{
-Other genejam: \code{\link{freshenGenes}}
+Other genejam: 
+\code{\link{freshenGenes}()}
 }
 \concept{genejam}
