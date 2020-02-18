@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">genejam</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.11.900</span>
       </span>
     </div>
 
@@ -114,7 +114,13 @@
     <p>Get annotation database or environment</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_anno_db</span>(<span class='no'>x</span>, <span class='kw'>revmap_suffix</span> <span class='kw'>=</span> <span class='st'>"2EG"</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>get_anno_db</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>revmap_suffix</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"2EG"</span>, <span class='st'>"2ENTREZID"</span>, <span class='st'>"2NAME"</span>),
+  <span class='kw'>ignore.case</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='no'>...</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -131,6 +137,16 @@ that can be used to create reverse-mapped annotation data, for
 example the suffix <code>"2EG"</code> is used to indicate that annotation
 returns Entrez gene. When annotation does not contain this suffix,
 the annotation is reverse-mapped using <code><a href='https://rdrr.io/pkg/AnnotationDbi/man/Bimap-direction.html'>AnnotationDbi::revmap()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>ignore.case</th>
+      <td><p>logical indicating whether to return an environment
+after converting all keys to lowercase, which is one implementation
+choice to provide case-insensitive output from <code><a href='https://rdrr.io/r/base/get.html'>mget()</a></code>. In order
+to fulfill the potential, the subsequent <code><a href='https://rdrr.io/r/base/get.html'>mget()</a></code> must also
+use <code><a href='https://rdrr.io/r/base/chartr.html'>tolower(x)</a></code> on the input character vector. Note that this
+option is currently fairly slow, and uses more memory while the
+environment is loaded.</p></td>
     </tr>
     <tr>
       <th>verbose</th>
@@ -152,7 +168,8 @@ or an annotation object, and returns the annotation object.</p>
 reverse mapped annotation object is returned.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other genejam: <code><a href='freshenGenes.html'>freshenGenes</a></code></p></div>
+    <div class='dont-index'><p>Other genejam: 
+<code><a href='freshenGenes.html'>freshenGenes</a>()</code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

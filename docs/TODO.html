@@ -67,7 +67,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">genejam</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.11.900</span>
       </span>
     </div>
 
@@ -108,60 +108,51 @@
 
 <div id="todo-for-genejam" class="section level1">
 
-<div id="new-option-handle_multipleeach_best" class="section level2">
+<div id="make-searches-case-insensitive" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-option-handle_multipleeach_best" class="anchor"></a>New option <code>handle_multiple="each_best"</code>
-</h2>
-<p>This option will essentially mimic <code>handle_multiple="first_try"</code> except that when the input data has delimited entries on each line, each delimited entry will be split and handled individually using the <code>"first_try"</code> logic.</p>
-<p>For example, consider an entry with:</p>
-<blockquote>
-<p><code>"APOE,HIST1H2A"</code></p>
-</blockquote>
-<p>The try list is <code>tryList=c("SYMBOL2EG","ACCNUM2EG","ALIAS2EG")</code> which means it will try to match:</p>
+<a href="#make-searches-case-insensitive" class="anchor"></a>Make searches case-insensitive</h2>
 <ul>
-<li>the official gene symbol <code>"SYMBOL2EG"</code> and stop if it finds a match</li>
-<li>then accession numbers <code>"ACCNUM2EG"</code> and stop if it finds a match</li>
-<li>then aliases <code>"ALIAS2EG"</code> and stop if it finds a match.</li>
+<li>This change requires something like <code>better_mget()</code> or perhaps more properly <code><a href="reference/imget.html">imget()</a></code>.</li>
+<li>The basic mechanism:</li>
 </ul>
-<p>The best entry for <code>"APOE"</code> is from <code>"SYMBOL2EG"</code>. The best entry for <code>"HIST1H2A"</code> is from <code>"ALIAS2EG"</code>.</p>
-<p>If we use <code>handle_multiple="first_try"</code> with <code>"APOE,HIST1H2A"</code> the output will be <code>"APOE"</code> – since we stop trying after the first <code>tryLib</code> entry is successful.</p>
-<p>Instead, we want to split <code>"APOE,HIST1H2A"</code> into <code>"APOE"</code> and <code>"HIST1H2A"</code>, then match each separately, then combine the results.</p>
-<p>When each entry contains aliases of the same gene, use <code>handle_multiple="first_try"</code>. When each entry contains different genes, and you want the best current annotation for each gene, use <code>handle_multiple="each_best"</code>.</p>
-<div id="basic-workflow" class="section level3">
+<p><code>{r, imget} input &lt;- c("Apoe", "h1-3", "Hist1H1C"); keys &lt;- ls(org.Hs.egSYMBOL2EG) keymatch &lt;- match(tolower(input), tolower(keys)) keysfound &lt;- !is.na(keymatch); values &lt;- as.list(jamba::nameVector(rep(NA, length(input)), input)) valuesfound &lt;- mget(keys[keymatch[keysfound]], org.Hs.egSYMBOL2EG, ifnotfound=NA) values[keysfound] &lt;- valuesfound; values;</code></p>
+<p>After some testing, it appears the slow step is retrieving all the keys, which is also performed each time the data is queried, compounding the problem.</p>
+<p>Current recommendation is to use <code><a href="reference/get_anno_db.html">get_anno_db(..., ignore.case=TRUE)</a></code> which returns an environment where all keys are forced to lowercase. In this case, the environment consumes real memory, and takes longer to prepare. However once prepared, the environment can be passed directory to <code><a href="reference/freshenGenes.html">freshenGenes()</a></code> for rapid operation.</p>
+</div>
+<div id="allow-entrezid-or-eg-as-optional-input-columns" class="section level2">
+<h2 class="hasAnchor">
+<a href="#allow-entrezid-or-eg-as-optional-input-columns" class="anchor"></a>Allow ENTREZID or EG as optional input column(s)</h2>
+</div>
+<div id="problem-space" class="section level2">
+<h2 class="hasAnchor">
+<a href="#problem-space" class="anchor"></a>Problem space</h2>
+<p>It is not currently possible to provide ENTREZID values at input, since these values are expected to be in the <code>"intermediate"</code> column after the first step in the process. There is no annotation that takes ENTREZID and returns ENTREZID.</p>
+<ul>
+<li>Allow <code>"ENTREZID"</code> or <code>"EG"</code> as an input column, some mechanism to allow input data to have the intermediate value, without having to query an annotation.</li>
+<li>It would essentially mark one or more columns with something like <code>"AsIs"</code> and the values would be delimited and used to populate the <code>"intermediate"</code> column without query.</li>
+<li>There could be a special-case <code>ann_lib="ASIS"</code> that would allow values in the <code>"AsIs"</code> columns to pass through, which would give a mechanism to try querying another column first, then using the <code>"ASIS"</code> column as a secondary option.</li>
+</ul>
+<div id="suggested-mechanism" class="section level3">
 <h3 class="hasAnchor">
-<a href="#basic-workflow" class="anchor"></a>Basic workflow</h3>
-<p>The general guidance is to use only one input column at a time.</p>
-<pre><code><a href="https://rdrr.io/r/base/library.html">require(org.Hs.eg.db);
-## Define an interesting input list
-input &lt;- c("APOE,HIST1H1C,HIST1H1D,,HIST1H2A", "HIST1H2A","APOA", "APOA,LPA,HIST1H1C");
-
-## Split the input by delimiter
-taller_list &lt;- strsplit(input, ",");
-## Make a vector and associated factor to split back into a list
-taller_vector &lt;- unlist(taller_list);
-taller_factor &lt;- rep(factor(seq_along(taller_list)),
-   lengths(taller_list));
-
-## run freshenGenes()
-taller_freshened &lt;- freshenGenes(taller_vector,
-   empty_rule="na",
-   handle_multiple="first_try");
-taller_freshened;
-
-## optionally review any changes
-changed_rows &lt;- subset(unique(taller_freshened), jamba::rmNA(naValue="",input) != jamba::rmNA(naValue="",SYMBOL));
-changed_rows;
-
-## Review changes entries in more detail
-jamba::mixedSortDF(byCols="SYMBOL", 
-   subset(unique(taller_freshened), 
-      SYMBOL %in% jamba::rmNA(changed_rows$SYMBOL)))
-
-## Split back into the original vector
-taller_freshened_split &lt;- split(taller_freshened$SYMBOL, taller_factor);
-
-## comma-delimit using only unique entries
-jamba::cPasteU(taller_freshened_split, na.rm=TRUE);</a></code></pre>
+<a href="#suggested-mechanism" class="anchor"></a>Suggested mechanism</h3>
+<ul>
+<li>
+<code>asis_colnames=c("ENTREZID","EG")</code> would define colnames <code><a href="https://rdrr.io/r/base/c.html">c("ENTREZID","EG")</a></code> as “ASIS” which means they are not to be queried.</li>
+<li>
+<p><code>ann_lib=c("ASIS", "SYMBOL2EG", "ALIAS2EG")</code> would process in order:</p>
+<ol>
+<li>take all values from the <code>asis_colnames</code> and delimit them to populate the <code>"intermediate"</code> column.</li>
+<li>query <code>"SYMBOL2EG"</code> using all columns except <code>asis_colnames</code>.</li>
+<li>query <code>"ALIAS2EG"</code> using all columns except <code>asis_colnames</code>.</li>
+</ol>
+</li>
+<li><p><code>ann_lib=c("SYMBOL2EG", "ASIS", "ALIAS2EG")</code> would process in order:</p></li>
+</ul>
+<ol>
+<li>query <code>"SYMBOL2EG"</code> using all columns except <code>asis_colnames</code>.</li>
+<li>Populate <code>"intermediate"</code> with delimited values from the <code>asis_colnames</code> using rules defined by <code>handle_multiple</code>. That is, when <code>handle_multiple="first_try"</code> then only rows with empty values in `“intermediate” column will be populated.</li>
+<li>query <code>"ALIAS2EG"</code> using all columns except <code>asis_colnames</code>.</li>
+</ol>
 </div>
 </div>
 </div>

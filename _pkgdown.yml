@@ -11,3 +11,7 @@ reference:
   desc: Functions that operate on list objects
   contents:
   - has_concept("jam list functions")
+- title: Jam utility functions
+  desc: Helpful utility functions
+  contents:
+  - has_concept("jam utility functions")

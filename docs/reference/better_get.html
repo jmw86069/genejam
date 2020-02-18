@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • genejam</title>
+<title>Better get() — better_get • genejam</title>
 
 
 <!-- jquery -->
@@ -35,7 +35,9 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Better get() — better_get" />
+<meta property="og:description" content="Better get()" />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -54,7 +56,7 @@
   </head>
 
   <body>
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -101,90 +103,66 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Better get()</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jmw86069/genejam/blob/master/R/genejam-freshen.R'><code>R/genejam-freshen.R</code></a></small>
+    <div class="hidden name"><code>better_get.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p>Better get()</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>better_get</span>(<span class='no'>x</span>, <span class='kw'>pos</span> <span class='kw'>=</span> -<span class='fl'>1L</span>, <span class='kw'>mode</span> <span class='kw'>=</span> <span class='st'>"any"</span>, <span class='kw'>inherits</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-genejam-core-functions" class="hasAnchor"><a href="#section-genejam-core-functions" class="anchor"></a>GeneJam core functions</h2>
-          <p class="section-desc"><p>Functions that assist with gene annotations</p></p>
-        </th>
-      </tr>
-      <tr>
-        
-        <td>
-          <p><code><a href="freshenGenes.html">freshenGenes()</a></code> </p>
-        </td>
-        <td><p>Freshen gene annotations using Bioconductor annotation data</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_anno_db.html">get_anno_db()</a></code> </p>
-        </td>
-        <td><p>Get annotation database or environment</p></td>
-      </tr>
-    </tbody><tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-jam-list-functions" class="hasAnchor"><a href="#section-jam-list-functions" class="anchor"></a>Jam list functions</h2>
-          <p class="section-desc"><p>Functions that operate on list objects</p></p>
-        </th>
-      </tr>
-      <tr>
-        
-        <td>
-          <p><code><a href="lgsub.html">lgsub()</a></code> </p>
-        </td>
-        <td><p>Pattern replacement in a list of character vectors</p></td>
-      </tr>
-    </tbody><tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-jam-utility-functions" class="hasAnchor"><a href="#section-jam-utility-functions" class="anchor"></a>Jam utility functions</h2>
-          <p class="section-desc"><p>Helpful utility functions</p></p>
-        </th>
-      </tr>
-      <tr>
-        
-        <td>
-          <p><code><a href="better_exists.html">better_exists()</a></code> </p>
-        </td>
-        <td><p>Better exists()</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="better_get.html">better_get()</a></code> </p>
-        </td>
-        <td><p>Better get()</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="imget.html">imget()</a></code> </p>
-        </td>
-        <td><p>Case-insensitive mget()</p></td>
-      </tr>
-    </tbody>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>pos, mode, inherits</th>
+      <td><p>arguments passed to <code><a href='https://rdrr.io/r/base/get.html'>base::get()</a></code>. Note
+that argument <code>envir</code> is not passed to <code><a href='https://rdrr.io/r/base/get.html'>base::get()</a></code>, since
+it is typically defined dynamically by that function.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>additional arguments are passed to <code><a href='https://rdrr.io/r/base/get.html'>base::get()</a></code>. The
+only additional argument is <code>envir</code> which is not recommended,
+but is here for compatibility with the base functionality.</p></td>
+    </tr>
+    <tr>
+      <th>character</th>
+      <td><p>string with an R object name, with or without
+an R package prefix. Note that only one value is recognized.</p></td>
+    </tr>
     </table>
-  </div>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>the R object found. If not object is found an error results.</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/get.html'>get</a></span>(<span class='st'>"get"</span>, <span class='kw'>pos</span><span class='kw'>=</span><span class='st'>"package:base"</span>)</div><div class='output co'>#&gt; function (x, pos = -1L, envir = as.environment(pos), mode = "any", 
+#&gt;     inherits = TRUE) 
+#&gt; .Internal(get(x, envir, mode, inherits))
+#&gt; &lt;bytecode: 0x7fb7d072ad68&gt;
+#&gt; &lt;environment: namespace:base&gt;</div><div class='input'>
+<span class='fu'>better_get</span>(<span class='st'>"base::get"</span>)</div><div class='output co'>#&gt; function (x, pos = -1L, envir = as.environment(pos), mode = "any", 
+#&gt;     inherits = TRUE) 
+#&gt; .Internal(get(x, envir, mode, inherits))
+#&gt; &lt;bytecode: 0x7fb7d072ad68&gt;
+#&gt; &lt;environment: namespace:base&gt;</div><div class='input'>
+</div></pre>
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-genejam-core-functions">GeneJam core functions</a></li>
-      <li><a href="#section-jam-list-functions">Jam list functions</a></li>
-      <li><a href="#section-jam-utility-functions">Jam utility functions</a></li>
+      <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#value">Value</a></li>
+      <li><a href="#examples">Examples</a></li>
     </ul>
+
   </div>
 </div>
 

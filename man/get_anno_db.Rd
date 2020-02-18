@@ -7,6 +7,7 @@
 get_anno_db(
   x,
   revmap_suffix = c("2EG", "2ENTREZID", "2NAME"),
+  ignore.case = FALSE,
   verbose = FALSE,
   ...
 )
@@ -20,6 +21,14 @@ that can be used to create reverse-mapped annotation data, for
 example the suffix \code{"2EG"} is used to indicate that annotation
 returns Entrez gene. When annotation does not contain this suffix,
 the annotation is reverse-mapped using \code{AnnotationDbi::revmap()}.}
+
+\item{ignore.case}{logical indicating whether to return an environment
+after converting all keys to lowercase, which is one implementation
+choice to provide case-insensitive output from \code{mget()}. In order
+to fulfill the potential, the subsequent \code{mget()} must also
+use \code{tolower(x)} on the input character vector. Note that this
+option is currently fairly slow, and uses more memory while the
+environment is loaded.}
 
 \item{verbose}{logical indicating whetheer to print verbose output.}
 

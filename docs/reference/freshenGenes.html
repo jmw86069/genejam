@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">genejam</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.11.900</span>
       </span>
     </div>
 
@@ -114,12 +114,20 @@
     <p>Freshen gene annotations using Bioconductor annotation data</p>
     </div>
 
-    <pre class="usage"><span class='fu'>freshenGenes</span>(<span class='no'>x</span>, <span class='kw'>annLib</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>""</span>, <span class='st'>"org.Hs.eg.db"</span>),
-  <span class='kw'>tryList</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"SYMBOL2EG"</span>, <span class='st'>"ACCNUM2EG"</span>, <span class='st'>"ALIAS2EG"</span>),
-  <span class='kw'>finalList</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"SYMBOL"</span>), <span class='kw'>split</span> <span class='kw'>=</span> <span class='st'>"[ ]*[,/;]+[ ]*"</span>, <span class='kw'>sep</span> <span class='kw'>=</span> <span class='st'>","</span>,
-  <span class='kw'>handle_multiple</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"first_try"</span>, <span class='st'>"first_hit"</span>, <span class='st'>"all"</span>),
-  <span class='kw'>empty_rule</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"original"</span>, <span class='st'>"empty"</span>, <span class='st'>"na"</span>), <span class='kw'>include_source</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>protect_inline_sep</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>freshenGenes</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>ann_lib</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>""</span>, <span class='st'>"org.Hs.eg.db"</span>),
+  <span class='kw'>try_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"SYMBOL2EG"</span>, <span class='st'>"ACCNUM2EG"</span>, <span class='st'>"ALIAS2EG"</span>),
+  <span class='kw'>final</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"SYMBOL"</span>),
+  <span class='kw'>split</span> <span class='kw'>=</span> <span class='st'>"[ ]*[,/;]+[ ]*"</span>,
+  <span class='kw'>sep</span> <span class='kw'>=</span> <span class='st'>","</span>,
+  <span class='kw'>handle_multiple</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"first_try"</span>, <span class='st'>"first_hit"</span>, <span class='st'>"all"</span>, <span class='st'>"best_each"</span>),
+  <span class='kw'>empty_rule</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"empty"</span>, <span class='st'>"original"</span>, <span class='st'>"na"</span>),
+  <span class='kw'>include_source</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>protect_inline_sep</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='no'>...</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -130,38 +138,46 @@
 containing gene symbols.</p></td>
     </tr>
     <tr>
-      <th>annLib</th>
-      <td><p>character value indicating the name of the Bioconductor
-annotation library to use when looking up gene nomenclature.</p></td>
+      <th>ann_lib</th>
+      <td><p>character vector indicating the name or names of the
+Bioconductor annotation library to use when looking up
+gene nomenclature.</p></td>
     </tr>
     <tr>
-      <th>tryList</th>
+      <th>try_list</th>
       <td><p>character vector indicating one or more names of
 annotations to use for the input gene symbols in <code>x</code>. The
 annotation should typically return the Entrez gene ID, usually
 given by <code>'2EG'</code> at the end of the name. For example <code>SYMBOL2EG</code>
-will be used with annLib <code>"org.Hs.eg.db"</code> to produce annotation
+will be used with ann_lib <code>"org.Hs.eg.db"</code> to produce annotation
 name <code>"org.Hs.egSYMBOL2EG"</code>. Note that when the <code>'2EG'</code> form of
-annotation does not exist, it will be derived using
-<code><a href='https://rdrr.io/pkg/AnnotationDbi/man/Bimap-direction.html'>AnnotationDbi::revmap()</a></code>. For example if <code>"org.Hs.egALIAS"</code>
-exists, but not <code>"org.Hs.egALIAS2EG"</code>, then this function will
-create a reverse-mapped <code>"org.Hs.egALIAS2EG"</code> derived from
-<code>"org.Hs.egALIAS"</code>.</p></td>
+annotation does not exist (or another suitable suffix defined in
+argument <code>"revmap_suffix"</code> in <code><a href='get_anno_db.html'>get_anno_db()</a></code>), it will be derived
+using <code><a href='https://rdrr.io/pkg/AnnotationDbi/man/Bimap-direction.html'>AnnotationDbi::revmap()</a></code>. For example if <code>"org.Hs.egALIAS"</code>
+is requested, but only <code>"org.Hs.egALIAS2EG"</code> is available, then
+<code><a href='https://rdrr.io/pkg/AnnotationDbi/man/Bimap-direction.html'>AnnotationDbi::revmap(org.Hs.egALIAS2EG)</a></code> is used to create the
+equivalent of <code>"org.Hs.egALIAS"</code>.</p></td>
     </tr>
     <tr>
-      <th>finalList</th>
+      <th>final</th>
       <td><p>character vector to use for the final conversion
-step. When finalList is <code>NULL</code> no conversion is performed.
-When <code>finalList</code> contains multiple values, each value is returned
-in the output. For example, <code>finalList=c("SYMBOL","GENENAME")</code> will
+step. When <code>final</code> is <code>NULL</code> no conversion is performed.
+When <code>final</code> contains multiple values, each value is returned
+in the output. For example, <code>final=c("SYMBOL","GENENAME")</code> will
 return a column <code>"SYMBOL"</code> and a column <code>"GENENAME"</code>.</p></td>
     </tr>
     <tr>
+      <th>split</th>
+      <td><p>character value used to separate delimited values in <code>x</code>
+by the function <code><a href='https://rdrr.io/r/base/strsplit.html'>base::strsplit()</a></code>. The default will split values
+separated by comma <code>,</code> semicolon <code>;</code> or forward slash <code>/</code>, and will
+trim whitespace before and after these delimiters.</p></td>
+    </tr>
+    <tr>
       <th>sep</th>
-      <td><p>character value used to separate delimited values in <code>x</code>.
-For example when <code>sep=","</code> then comma-delimited values will be split
-into separate columns, and each column can be used in the gene
-annotation update. See <code>handle_multiple</code>.</p></td>
+      <td><p>character value used to concatenate multiple entries in
+the same field. The default <code>sep=","</code> will comma-delimit multiple
+entries in the same field.</p></td>
     </tr>
     <tr>
       <th>handle_multiple</th>
@@ -170,12 +186,12 @@ values: <code>"first_hit"</code> will query each column of <code>x</code> until 
 first possible returning match, and will ignore all subsequent possible
 matches for that row in <code>x</code>. For example, if one row in <code>x</code> contains
 multiple values, only the first match will be used. <code>"first_try"</code>
-will return the first match from <code>tryList</code> for all columns in <code>x</code>
+will return the first match from <code>try_list</code> for all columns in <code>x</code>
 that contain a match. For example, if one row in <code>x</code> contains two
-values, the first match from <code>tryList</code> using one or both columns in
-<code>x</code> will be maintained. Subsequent entries in <code>tryList</code> will not be
+values, the first match from <code>try_list</code> using one or both columns in
+<code>x</code> will be maintained. Subsequent entries in <code>try_list</code> will not be
 attempted for rows that already have a match. <code>"all"</code> will return all
-possible matches for all entries in <code>x</code> using all items in <code>tryList</code>.</p></td>
+possible matches for all entries in <code>x</code> using all items in <code>try_list</code>.</p></td>
     </tr>
     <tr>
       <th>empty_rule</th>
@@ -213,93 +229,116 @@ into two strings <code>"H4 clustered histone 10"</code> and <code>"pseudogene"</
 
     <p><code>data.frame</code> with one or more columns indicating the input
 data, then a column <code>"intermediate"</code> containing the Entrez gene ID
-that was matched, then one column for each item in <code>finalList</code>,
+that was matched, then one column for each item in <code>final</code>,
 by default <code>"SYMBOL"</code>.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>This function takes a vector or <code>data.frame</code> of gene symbols,
 and uses Bioconductor annotation methods to find the most current
 official gene symbol.</p>
-<p>The function can also be customized to return
-additional annotation, or custom annotation.</p>
-<p>The annotation process is intended to run in two steps:</p><ol>
-<li><p>Convert the input gene symbol to the recognized Entrez gene ID,
-usually using something like <code>"org.Hs.egSYMBOL2EG"</code> which returns
-a character string with Entrez gene identifier. When the
-gene symbol is not recognized, the backup plan is to use gene
-aliases, accession numbers, or other relevant annotations to
-find the current official gene. However, these steps are not
-as trusted as using the <code>"SYMBOL2EG"</code> approach, so that step
-is attempted first.</p></li>
-<li><p>Convert the Entrez gene identifier to the official Entrez gene
-symbol, usually using something like <code>"org.Hs.egSYMBOL"</code>. This
-step is also a convenient time to include things like the
-descriptive gene name, which is provided by <code>"org.Hs.egGENENAME"</code>.</p></li>
+<p>The annotation process runs in two basic steps:</p><ol>
+<li><p><strong>Convert the input gene to Entrez gene ID</strong>.</p></li>
+<li><p><strong>Convert Entrez gene ID to official gene symbol</strong>.</p></li>
 </ol>
+<h3>Step 1. Convert to Entrez gene ID</h3>
+
+
+<p>The first step uses an ordered list of annotations,
+with the assumption that the first match is usually the best,
+and most specific. By default, the order is:</p><ul>
+<li><p><code>"org.Hs.egSYMBOL2EG"</code> -- almost always 1-to-1 match</p></li>
+<li><p><code>"org.Hs.egACCNUM2EG"</code> -- mostly a 1-to-1 match</p></li>
+<li><p><code>"org.Hs.egALIAS2EG"</code> -- sometimes a 1-to-1 match, sometimes 1-to-many</p></li>
+</ul>
+
+<p>When multiple Entrez gene ID values are matched, they are all
+retained. See argument <code>handle_multiple</code> for custom options.</p>
+
+<h3>Step 2. Use Entrez gene ID to return official annotation</h3>
+
+
+<p>The second step converts the Entrez gene ID (or multiple IDs)
+to the official gene symbol, by default using <code>"org.Hs.egSYMBOL"</code>.</p>
+<p>The second step may optionally include multiple annotation types,
+each of which will be returned. Some common examples:</p><ul>
+<li><p><code>"org.Hs.egSYMBOL"</code> -- official Entrez gene symbol</p></li>
+<li><p><code>"org.Hs.egALIAS"</code> -- set of recognized aliases for an Entrez gene.</p></li>
+<li><p><code>"org.Hs.egGENENAME"</code> -- official Entrez long gene name</p></li>
+</ul>
+
+<p>For each step, the annotation matched can be returned, as an audit
+trail to see which annotation was available for each input entry.</p>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other genejam: <code><a href='get_anno_db.html'>get_anno_db</a></code></p></div>
+    <div class='dont-index'><p>Other genejam: 
+<code><a href='get_anno_db.html'>get_anno_db</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/message.html'>suppressPackageStartupMessages</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='no'>org.Hs.eg.db</span>))) {
    <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span>(<span class='st'>"\nBasic usage\n"</span>);
    <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'>freshenGenes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"APOE"</span>, <span class='st'>"CCN2"</span>, <span class='st'>"CTGF"</span>)));
-
-   <span class='co'>## Optionally show the annotation source matched</span>
-   <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span>(<span class='st'>"\nOptionally show the annotation source matched\n"</span>);
-   <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'>freshenGenes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"APOE"</span>, <span class='st'>"CCN2"</span>, <span class='st'>"CTGF"</span>), <span class='kw'>include_source</span><span class='kw'>=</span><span class='fl'>TRUE</span>));
-
-   <span class='co'>## Show comma-delimited genes</span>
-   <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span>(<span class='st'>"\nInput genes are comma-delimited\n"</span>);
-   <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'>freshenGenes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"APOE"</span>, <span class='st'>"CCN2"</span>, <span class='st'>"CTGF"</span>, <span class='st'>"CCN2,CTGF"</span>)));
-
-   <span class='co'>## Optionally include more than SYMBOL in the output</span>
-   <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span>(<span class='st'>"\nCustom output to include SYMBOL, ALIAS, GENENAME\n"</span>);
-   <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'>freshenGenes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"APOE"</span>, <span class='st'>"HIST1H1C"</span>),
-      <span class='kw'>finalList</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"SYMBOL"</span>, <span class='st'>"ALIAS"</span>, <span class='st'>"GENENAME"</span>)));
-
-   <span class='co'>## More advanced, match affymetrix probesets</span>
-   <span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/message.html'>suppressPackageStartupMessages</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='no'>hgu133plus2.db</span>))) {
-      <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span>(<span class='st'>"\nAdvanced example including Affymetrix probesets.\n"</span>);
-      <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'>freshenGenes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"227047_x_at"</span>,<span class='st'>"APOE"</span>,<span class='st'>"HIST1H1D"</span>),
-         <span class='kw'>include_source</span><span class='kw'>=</span><span class='fl'>TRUE</span>,
-         <span class='kw'>tryList</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"hgu133plus2ENTREZID"</span>,<span class='st'>"org.Hs.egSYMBOL2EG"</span>,<span class='st'>"org.Hs.egALIAS2EG"</span>),
-         <span class='kw'>finalList</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"org.Hs.egSYMBOL"</span>)))
-   }
 }</div><div class='output co'>#&gt; 
 #&gt; Basic usage
 #&gt;   input intermediate SYMBOL
 #&gt; 1  APOE          348   APOE
 #&gt; 2  CCN2         1490   CCN2
-#&gt; 3  CTGF         1490   CCN2
-#&gt; 
+#&gt; 3  CTGF         1490   CCN2</div><div class='input'>
+<span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/message.html'>suppressPackageStartupMessages</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='no'>org.Hs.eg.db</span>))) {
+   <span class='co'>## Optionally show the annotation source matched</span>
+   <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span>(<span class='st'>"\nOptionally show the annotation source matched\n"</span>);
+   <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'>freshenGenes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"APOE"</span>, <span class='st'>"CCN2"</span>, <span class='st'>"CTGF"</span>), <span class='kw'>include_source</span><span class='kw'>=</span><span class='fl'>TRUE</span>));
+}</div><div class='output co'>#&gt; 
 #&gt; Optionally show the annotation source matched
 #&gt;   input intermediate intermediate_source SYMBOL
 #&gt; 1  APOE          348  org.Hs.egSYMBOL2EG   APOE
 #&gt; 2  CCN2         1490  org.Hs.egSYMBOL2EG   CCN2
-#&gt; 3  CTGF         1490   org.Hs.egALIAS2EG   CCN2
-#&gt; 
+#&gt; 3  CTGF         1490   org.Hs.egALIAS2EG   CCN2</div><div class='input'>
+<span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/message.html'>suppressPackageStartupMessages</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='no'>org.Hs.eg.db</span>))) {
+   <span class='co'>## Show comma-delimited genes</span>
+   <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span>(<span class='st'>"\nInput genes are comma-delimited\n"</span>);
+   <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'>freshenGenes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"APOE"</span>, <span class='st'>"CCN2"</span>, <span class='st'>"CTGF"</span>, <span class='st'>"CCN2,CTGF"</span>)));
+}</div><div class='output co'>#&gt; 
 #&gt; Input genes are comma-delimited
 #&gt;   input_v1 input_v2 intermediate SYMBOL
 #&gt; 1     APOE                   348   APOE
 #&gt; 2     CCN2                  1490   CCN2
 #&gt; 3     CTGF                  1490   CCN2
-#&gt; 4     CCN2     CTGF         1490   CCN2
-#&gt; 
+#&gt; 4     CCN2     CTGF         1490   CCN2</div><div class='input'>
+<span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/message.html'>suppressPackageStartupMessages</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='no'>org.Hs.eg.db</span>))) {
+   <span class='co'>## Optionally include more than SYMBOL in the output</span>
+   <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span>(<span class='st'>"\nCustom output to include SYMBOL, ALIAS, GENENAME\n"</span>);
+   <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'>freshenGenes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"APOE"</span>, <span class='st'>"HIST1H1C"</span>),
+      <span class='kw'>final</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"SYMBOL"</span>, <span class='st'>"ALIAS"</span>, <span class='st'>"GENENAME"</span>)));
+}</div><div class='output co'>#&gt; 
 #&gt; Custom output to include SYMBOL, ALIAS, GENENAME
 #&gt;      input intermediate SYMBOL                             ALIAS
 #&gt; 1     APOE          348   APOE   AD2,APO-E,ApoE4,APOE,LDLCQ5,LPG
 #&gt; 2 HIST1H1C         3006   H1-2 H1-2,H1.2,H1C,H1F2,H1s-1,HIST1H1C
 #&gt;                              GENENAME
 #&gt; 1                    apolipoprotein E
-#&gt; 2 H1.2 linker histone, cluster member
-#&gt; 
+#&gt; 2 H1.2 linker histone, cluster member</div><div class='input'>
+<span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/message.html'>suppressPackageStartupMessages</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='no'>org.Hs.eg.db</span>))) {
+   <span class='co'>## More advanced, match affymetrix probesets</span>
+   <span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/message.html'>suppressPackageStartupMessages</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='no'>hgu133plus2.db</span>))) {
+      <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span>(<span class='st'>"\nAdvanced example including Affymetrix probesets.\n"</span>);
+      <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'>freshenGenes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"227047_x_at"</span>,<span class='st'>"APOE"</span>,<span class='st'>"HIST1H1D"</span>,<span class='st'>"NM_003166,U08032"</span>),
+         <span class='kw'>include_source</span><span class='kw'>=</span><span class='fl'>TRUE</span>,
+         <span class='kw'>try_list</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"hgu133plus2ENTREZID"</span>,<span class='st'>"REFSEQ2EG"</span>,<span class='st'>"SYMBOL2EG"</span>,<span class='st'>"ACCNUM2EG"</span>,<span class='st'>"ALIAS2EG"</span>),
+         <span class='kw'>final</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"SYMBOL"</span>,<span class='st'>"GENENAME"</span>)))
+   }
+}</div><div class='output co'>#&gt; 
 #&gt; Advanced example including Affymetrix probesets.
-#&gt;         input intermediate intermediate_source org.Hs.egSYMBOL
-#&gt; 1 227047_x_at        57659 hgu133plus2ENTREZID           ZBTB4
-#&gt; 2        APOE          348  org.Hs.egSYMBOL2EG            APOE
-#&gt; 3    HIST1H1D         3007   org.Hs.egALIAS2EG            H1-3</div><div class='input'>
+#&gt;      input_v1 input_v2 intermediate intermediate_source  SYMBOL
+#&gt; 1 227047_x_at                 57659 hgu133plus2ENTREZID   ZBTB4
+#&gt; 2        APOE                   348  org.Hs.egSYMBOL2EG    APOE
+#&gt; 3    HIST1H1D                  3007   org.Hs.egALIAS2EG    H1-3
+#&gt; 4   NM_003166   U08032         6818  org.Hs.egREFSEQ2EG SULT1A3
+#&gt;                                  GENENAME
+#&gt; 1 zinc finger and BTB domain containing 4
+#&gt; 2                        apolipoprotein E
+#&gt; 3     H1.3 linker histone, cluster member
+#&gt; 4     sulfotransferase family 1A member 3</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

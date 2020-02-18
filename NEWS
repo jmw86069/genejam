@@ -1,3 +1,37 @@
+# Version 0.0.11.900
+
+## Changes to existing functions
+
+* To prepare for a wider release, I decided to rename (!) some
+arguments, to have snake_case instead of camelCase for consistency.
+I heard myself complaining about my own package, "Why are some arguments
+camelCase and others are snake_case? Pick one!" I complain with a
+smile on my face, but still it's a fair point.
+
+    * `finalList` is now `final`
+    * `tryList` is now `try_list`
+    * `annLib` is now `ann_lib`
+    
+I suppose I should probably rename `freshenGenes()` to `freshen_genes()`.
+
+## Changes to existing functions
+
+* `get_anno_db()` new argument `ignore.case` which will build an
+environment where all keys are converted to lowercase. Ultimately,
+this option incurs the lowest performance hit, since the keys
+only need to be converted once, then the environment can be used
+repeatedly with native `mget()` functions.
+
+## New function
+
+* `imget()` case-insensitive `mget()` -- however once I tested it,
+I realized this mechanism is fairly slow when using a fairly large
+annotation object. Also, if querying the same data multiple times
+using `imget()`, there is no re-use and the cost is incurred each
+operation -- very much not ideal. This function will likely be
+retired soon.
+
+
 # Version 0.0.10.900
 
 ## New functions

@@ -6,13 +6,13 @@
 \usage{
 freshenGenes(
   x,
-  annLib = c("", "org.Hs.eg.db"),
-  tryList = c("SYMBOL2EG", "ACCNUM2EG", "ALIAS2EG"),
-  finalList = c("SYMBOL"),
+  ann_lib = c("", "org.Hs.eg.db"),
+  try_list = c("SYMBOL2EG", "ACCNUM2EG", "ALIAS2EG"),
+  final = c("SYMBOL"),
   split = "[ ]*[,/;]+[ ]*",
   sep = ",",
   handle_multiple = c("first_try", "first_hit", "all", "best_each"),
-  empty_rule = c("original", "empty", "na"),
+  empty_rule = c("empty", "original", "na"),
   include_source = FALSE,
   protect_inline_sep = TRUE,
   verbose = FALSE,
@@ -23,25 +23,27 @@ freshenGenes(
 \item{x}{character vector or \code{data.frame} with one or most columns
 containing gene symbols.}
 
-\item{annLib}{character value indicating the name of the Bioconductor
-annotation library to use when looking up gene nomenclature.}
+\item{ann_lib}{character vector indicating the name or names of the
+Bioconductor annotation library to use when looking up
+gene nomenclature.}
 
-\item{tryList}{character vector indicating one or more names of
+\item{try_list}{character vector indicating one or more names of
 annotations to use for the input gene symbols in \code{x}. The
 annotation should typically return the Entrez gene ID, usually
 given by \code{'2EG'} at the end of the name. For example \code{SYMBOL2EG}
-will be used with annLib \code{"org.Hs.eg.db"} to produce annotation
+will be used with ann_lib \code{"org.Hs.eg.db"} to produce annotation
 name \code{"org.Hs.egSYMBOL2EG"}. Note that when the \code{'2EG'} form of
-annotation does not exist, it will be derived using
-\code{AnnotationDbi::revmap()}. For example if \code{"org.Hs.egALIAS"}
-exists, but not \code{"org.Hs.egALIAS2EG"}, then this function will
-create a reverse-mapped \code{"org.Hs.egALIAS2EG"} derived from
-\code{"org.Hs.egALIAS"}.}
+annotation does not exist (or another suitable suffix defined in
+argument \code{"revmap_suffix"} in \code{get_anno_db()}), it will be derived
+using \code{AnnotationDbi::revmap()}. For example if \code{"org.Hs.egALIAS"}
+is requested, but only \code{"org.Hs.egALIAS2EG"} is available, then
+\code{AnnotationDbi::revmap(org.Hs.egALIAS2EG)} is used to create the
+equivalent of \code{"org.Hs.egALIAS"}.}
 
-\item{finalList}{character vector to use for the final conversion
-step. When finalList is \code{NULL} no conversion is performed.
-When \code{finalList} contains multiple values, each value is returned
-in the output. For example, \code{finalList=c("SYMBOL","GENENAME")} will
+\item{final}{character vector to use for the final conversion
+step. When \code{final} is \code{NULL} no conversion is performed.
+When \code{final} contains multiple values, each value is returned
+in the output. For example, \code{final=c("SYMBOL","GENENAME")} will
 return a column \code{"SYMBOL"} and a column \code{"GENENAME"}.}
 
 \item{split}{character value used to separate delimited values in \code{x}
@@ -58,12 +60,12 @@ values: \code{"first_hit"} will query each column of \code{x} until it finds the
 first possible returning match, and will ignore all subsequent possible
 matches for that row in \code{x}. For example, if one row in \code{x} contains
 multiple values, only the first match will be used. \code{"first_try"}
-will return the first match from \code{tryList} for all columns in \code{x}
+will return the first match from \code{try_list} for all columns in \code{x}
 that contain a match. For example, if one row in \code{x} contains two
-values, the first match from \code{tryList} using one or both columns in
-\code{x} will be maintained. Subsequent entries in \code{tryList} will not be
+values, the first match from \code{try_list} using one or both columns in
+\code{x} will be maintained. Subsequent entries in \code{try_list} will not be
 attempted for rows that already have a match. \code{"all"} will return all
-possible matches for all entries in \code{x} using all items in \code{tryList}.}
+possible matches for all entries in \code{x} using all items in \code{try_list}.}
 
 \item{empty_rule}{character value indicating how to handle entries which
 did not have a match, and are therefore empty: \code{"original"} will use
@@ -90,7 +92,7 @@ into two strings \code{"H4 clustered histone 10"} and \code{"pseudogene"}.}
 \value{
 \code{data.frame} with one or more columns indicating the input
 data, then a column \code{"intermediate"} containing the Entrez gene ID
-that was matched, then one column for each item in \code{finalList},
+that was matched, then one column for each item in \code{final},
 by default \code{"SYMBOL"}.
 }
 \description{
@@ -142,27 +144,35 @@ trail to see which annotation was available for each input entry.
 if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
    cat("\nBasic usage\n");
    print(freshenGenes(c("APOE", "CCN2", "CTGF")));
-   
+}
+
+if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
    ## Optionally show the annotation source matched
    cat("\nOptionally show the annotation source matched\n");
    print(freshenGenes(c("APOE", "CCN2", "CTGF"), include_source=TRUE));
-   
+}
+
+if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
    ## Show comma-delimited genes
    cat("\nInput genes are comma-delimited\n");
    print(freshenGenes(c("APOE", "CCN2", "CTGF", "CCN2,CTGF")));
-   
+}
+
+if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
    ## Optionally include more than SYMBOL in the output
    cat("\nCustom output to include SYMBOL, ALIAS, GENENAME\n");
    print(freshenGenes(c("APOE", "HIST1H1C"),
-      finalList=c("SYMBOL", "ALIAS", "GENENAME")));
-      
+      final=c("SYMBOL", "ALIAS", "GENENAME")));
+}
+
+if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
    ## More advanced, match affymetrix probesets
    if (suppressPackageStartupMessages(require(hgu133plus2.db))) {
       cat("\nAdvanced example including Affymetrix probesets.\n");
-      print(freshenGenes(c("227047_x_at","APOE","HIST1H1D"),
+      print(freshenGenes(c("227047_x_at","APOE","HIST1H1D","NM_003166,U08032"),
          include_source=TRUE,
-         tryList=c("hgu133plus2ENTREZID","org.Hs.egSYMBOL2EG","org.Hs.egALIAS2EG"),
-         finalList=c("org.Hs.egSYMBOL")))
+         try_list=c("hgu133plus2ENTREZID","REFSEQ2EG","SYMBOL2EG","ACCNUM2EG","ALIAS2EG"),
+         final=c("SYMBOL","GENENAME")))
    }
 }
 

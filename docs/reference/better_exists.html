@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • genejam</title>
+<title>Better exists() — better_exists • genejam</title>
 
 
 <!-- jquery -->
@@ -35,7 +35,9 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Better exists() — better_exists" />
+<meta property="og:description" content="Better exists()" />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -54,7 +56,7 @@
   </head>
 
   <body>
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -101,90 +103,65 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Better exists()</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jmw86069/genejam/blob/master/R/genejam-freshen.R'><code>R/genejam-freshen.R</code></a></small>
+    <div class="hidden name"><code>better_exists.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p>Better exists()</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>better_exists</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>where</span> <span class='kw'>=</span> -<span class='fl'>1</span>,
+  <span class='kw'>mode</span> <span class='kw'>=</span> <span class='st'>"any"</span>,
+  <span class='kw'>inherits</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='no'>...</span>
+)</pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-genejam-core-functions" class="hasAnchor"><a href="#section-genejam-core-functions" class="anchor"></a>GeneJam core functions</h2>
-          <p class="section-desc"><p>Functions that assist with gene annotations</p></p>
-        </th>
-      </tr>
-      <tr>
-        
-        <td>
-          <p><code><a href="freshenGenes.html">freshenGenes()</a></code> </p>
-        </td>
-        <td><p>Freshen gene annotations using Bioconductor annotation data</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_anno_db.html">get_anno_db()</a></code> </p>
-        </td>
-        <td><p>Get annotation database or environment</p></td>
-      </tr>
-    </tbody><tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-jam-list-functions" class="hasAnchor"><a href="#section-jam-list-functions" class="anchor"></a>Jam list functions</h2>
-          <p class="section-desc"><p>Functions that operate on list objects</p></p>
-        </th>
-      </tr>
-      <tr>
-        
-        <td>
-          <p><code><a href="lgsub.html">lgsub()</a></code> </p>
-        </td>
-        <td><p>Pattern replacement in a list of character vectors</p></td>
-      </tr>
-    </tbody><tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-jam-utility-functions" class="hasAnchor"><a href="#section-jam-utility-functions" class="anchor"></a>Jam utility functions</h2>
-          <p class="section-desc"><p>Helpful utility functions</p></p>
-        </th>
-      </tr>
-      <tr>
-        
-        <td>
-          <p><code><a href="better_exists.html">better_exists()</a></code> </p>
-        </td>
-        <td><p>Better exists()</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="better_get.html">better_get()</a></code> </p>
-        </td>
-        <td><p>Better get()</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="imget.html">imget()</a></code> </p>
-        </td>
-        <td><p>Case-insensitive mget()</p></td>
-      </tr>
-    </tbody>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x</th>
+      <td><p>character vector length 1 or more, indicating the
+object names, with or without package prefix.</p></td>
+    </tr>
+    <tr>
+      <th>where, mode, inherits</th>
+      <td><p>arguments passed to <code><a href='https://rdrr.io/r/base/exists.html'>base::exists()</a></code>.
+Note that arguments <code>envir</code> and <code>frame</code> use the defaults,
+and therefore may not be compatible with using input <code>x</code>
+with more than one value.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>additional arguments are passed to <code><a href='https://rdrr.io/r/base/exists.html'>base::exists()</a></code>.</p>
+<p>#' @examples
+exists("exists", where="package:base")</p>
+<p>better_exists("base::exists")</p></td>
+    </tr>
     </table>
-  </div>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>logical vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(x)</a></code>. Note that
+when a package prefix is supplied, when the package is not on
+the search path this function returns <code>FALSE</code>, and does not
+throw an error.</p>
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-genejam-core-functions">GeneJam core functions</a></li>
-      <li><a href="#section-jam-list-functions">Jam list functions</a></li>
-      <li><a href="#section-jam-utility-functions">Jam utility functions</a></li>
+      <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#value">Value</a></li>
     </ul>
+
   </div>
 </div>
 

@@ -43,30 +43,32 @@
 #' 
 #' @return `data.frame` with one or more columns indicating the input
 #' data, then a column `"intermediate"` containing the Entrez gene ID
-#' that was matched, then one column for each item in `finalList`,
+#' that was matched, then one column for each item in `final`,
 #' by default `"SYMBOL"`.
 #' 
 #' @family genejam
 #' 
 #' @param x character vector or `data.frame` with one or most columns
 #'    containing gene symbols.
-#' @param annLib character value indicating the name of the Bioconductor
-#'    annotation library to use when looking up gene nomenclature.
-#' @param tryList character vector indicating one or more names of
+#' @param ann_lib character vector indicating the name or names of the
+#'    Bioconductor annotation library to use when looking up
+#'    gene nomenclature.
+#' @param try_list character vector indicating one or more names of
 #'    annotations to use for the input gene symbols in `x`. The
 #'    annotation should typically return the Entrez gene ID, usually
 #'    given by `'2EG'` at the end of the name. For example `SYMBOL2EG`
-#'    will be used with annLib `"org.Hs.eg.db"` to produce annotation
+#'    will be used with ann_lib `"org.Hs.eg.db"` to produce annotation
 #'    name `"org.Hs.egSYMBOL2EG"`. Note that when the `'2EG'` form of
-#'    annotation does not exist, it will be derived using
-#'    `AnnotationDbi::revmap()`. For example if `"org.Hs.egALIAS"`
-#'    exists, but not `"org.Hs.egALIAS2EG"`, then this function will
-#'    create a reverse-mapped `"org.Hs.egALIAS2EG"` derived from
-#'    `"org.Hs.egALIAS"`.
-#' @param finalList character vector to use for the final conversion
-#'    step. When finalList is `NULL` no conversion is performed.
-#'    When `finalList` contains multiple values, each value is returned
-#'    in the output. For example, `finalList=c("SYMBOL","GENENAME")` will
+#'    annotation does not exist (or another suitable suffix defined in 
+#'    argument `"revmap_suffix"` in `get_anno_db()`), it will be derived
+#'    using `AnnotationDbi::revmap()`. For example if `"org.Hs.egALIAS"`
+#'    is requested, but only `"org.Hs.egALIAS2EG"` is available, then
+#'    `AnnotationDbi::revmap(org.Hs.egALIAS2EG)` is used to create the
+#'    equivalent of `"org.Hs.egALIAS"`.
+#' @param final character vector to use for the final conversion
+#'    step. When `final` is `NULL` no conversion is performed.
+#'    When `final` contains multiple values, each value is returned
+#'    in the output. For example, `final=c("SYMBOL","GENENAME")` will
 #'    return a column `"SYMBOL"` and a column `"GENENAME"`.
 #' @param split character value used to separate delimited values in `x`
 #'    by the function `base::strsplit()`. The default will split values
@@ -80,12 +82,12 @@
 #'    first possible returning match, and will ignore all subsequent possible
 #'    matches for that row in `x`. For example, if one row in `x` contains
 #'    multiple values, only the first match will be used. `"first_try"`
-#'    will return the first match from `tryList` for all columns in `x`
+#'    will return the first match from `try_list` for all columns in `x`
 #'    that contain a match. For example, if one row in `x` contains two
-#'    values, the first match from `tryList` using one or both columns in
-#'    `x` will be maintained. Subsequent entries in `tryList` will not be
+#'    values, the first match from `try_list` using one or both columns in
+#'    `x` will be maintained. Subsequent entries in `try_list` will not be
 #'    attempted for rows that already have a match. `"all"` will return all
-#'    possible matches for all entries in `x` using all items in `tryList`.
+#'    possible matches for all entries in `x` using all items in `try_list`.
 #' @param empty_rule character value indicating how to handle entries which
 #'    did not have a match, and are therefore empty: `"original"` will use
 #'    the original entry as the output field; `"empty"` will leave the
@@ -109,40 +111,48 @@
 #' if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
 #'    cat("\nBasic usage\n");
 #'    print(freshenGenes(c("APOE", "CCN2", "CTGF")));
-#'    
+#' }
+#' 
+#' if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
 #'    ## Optionally show the annotation source matched
 #'    cat("\nOptionally show the annotation source matched\n");
 #'    print(freshenGenes(c("APOE", "CCN2", "CTGF"), include_source=TRUE));
-#'    
+#' }
+#' 
+#' if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
 #'    ## Show comma-delimited genes
 #'    cat("\nInput genes are comma-delimited\n");
 #'    print(freshenGenes(c("APOE", "CCN2", "CTGF", "CCN2,CTGF")));
-#'    
+#' }
+#' 
+#' if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
 #'    ## Optionally include more than SYMBOL in the output
 #'    cat("\nCustom output to include SYMBOL, ALIAS, GENENAME\n");
 #'    print(freshenGenes(c("APOE", "HIST1H1C"),
-#'       finalList=c("SYMBOL", "ALIAS", "GENENAME")));
-#'       
+#'       final=c("SYMBOL", "ALIAS", "GENENAME")));
+#' }
+#' 
+#' if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
 #'    ## More advanced, match affymetrix probesets
 #'    if (suppressPackageStartupMessages(require(hgu133plus2.db))) {
 #'       cat("\nAdvanced example including Affymetrix probesets.\n");
-#'       print(freshenGenes(c("227047_x_at","APOE","HIST1H1D"),
+#'       print(freshenGenes(c("227047_x_at","APOE","HIST1H1D","NM_003166,U08032"),
 #'          include_source=TRUE,
-#'          tryList=c("hgu133plus2ENTREZID","org.Hs.egSYMBOL2EG","org.Hs.egALIAS2EG"),
-#'          finalList=c("org.Hs.egSYMBOL")))
+#'          try_list=c("hgu133plus2ENTREZID","REFSEQ2EG","SYMBOL2EG","ACCNUM2EG","ALIAS2EG"),
+#'          final=c("SYMBOL","GENENAME")))
 #'    }
 #' }
 #' 
 #' @export
 freshenGenes <- function
 (x,
- annLib=c("","org.Hs.eg.db"),
- tryList=c("SYMBOL2EG", "ACCNUM2EG", "ALIAS2EG"),
- finalList=c("SYMBOL"),
+ ann_lib=c("","org.Hs.eg.db"),
+ try_list=c("SYMBOL2EG", "ACCNUM2EG", "ALIAS2EG"),
+ final=c("SYMBOL"),
  split="[ ]*[,/;]+[ ]*",
  sep=",",
  handle_multiple=c("first_try", "first_hit", "all", "best_each"),
- empty_rule=c("original", "empty", "na"),
+ empty_rule=c("empty", "original", "na"),
  include_source=FALSE,
  protect_inline_sep=TRUE,
  verbose=FALSE,
@@ -151,13 +161,16 @@ freshenGenes <- function
    ###
    handle_multiple <- match.arg(handle_multiple);
    empty_rule <- match.arg(empty_rule);
-   if (length(annLib) == 0) {
-      annLib <- "";
+   if (length(ann_lib) == 0) {
+      ann_lib <- "";
    }
-   test_annlib <- setdiff(annLib, c(NA,""));
-   if (length(test_annlib) > 0 && 
-      !suppressPackageStartupMessages(require(test_annlib, character.only=TRUE))) {
-      stop("Not all packages in annLib are available.");
+   test_ann_lib <- setdiff(ann_lib, c(NA,""));
+   if (length(test_ann_lib) > 0) {
+      for (test_lib in test_ann_lib) {
+         if (!suppressPackageStartupMessages(require(test_lib, character.only=TRUE))) {
+            stop(paste0("Package '", test_lib, "' is not available."));
+         }
+      }
    }
    if (is.atomic(x)) {
       x <- data.frame(input=as.character(x),
@@ -191,9 +204,9 @@ freshenGenes <- function
          ## empty_rule="na" here so blank entries will get dropped
          ## then we can replace as needed later
          taller_freshened <- freshenGenes(x=taller_vector,
-            annLib=annLib,
-            tryList=tryList,
-            finalList=finalList,
+            ann_lib=ann_lib,
+            try_list=try_list,
+            final=final,
             split=split,
             sep=sep,
             handle_multiple="first_try",
@@ -205,7 +218,7 @@ freshenGenes <- function
          if (length(taller_factor) == 0) {
             return(taller_freshened);
          }
-         final_colnames <- jamba::provigrep(c(finalList,
+         final_colnames <- jamba::provigrep(c(final,
             "^intermediate",
             "_source$"),
             colnames(taller_freshened));
@@ -249,36 +262,41 @@ freshenGenes <- function
    if ("first_try" %in% handle_multiple) {
       x[["found_try"]] <- rep(TRUE, nrow(x));
    }
-   
+
    ## Iterate each column to find a match
-   for (iann in annLib) {
-      if (verbose) {
-         jamba::printDebug("freshenGenes(): ",
-            "iann:",
-            iann);
-      }
-      for (itry in tryList) {
-         if ("character" %in% class(itry) && jamba::igrepHas("[.]db$", iann)) {
+   for (itry in try_list) {
+      for (iann in ann_lib) {
+         if (verbose) {
+            jamba::printDebug("freshenGenes(): ",
+               "iann:'",
+               iann, "'");
+         }
+         if ("character" %in% class(itry)) {
             itryname <- paste0(gsub("[.]db$", "", iann), itry);
             if (verbose) {
                jamba::printDebug("freshenGenes(): ",
-                  itryname);
+                  "itryname:'",
+                  itryname, "'");
             }
-            itry <- get_anno_db(itryname,
+            ienv <- get_anno_db(itryname,
                verbose=verbose,
                ...);
-            itryname <- attr(itry, "annoname");
+            itryname <- attr(ienv, "annoname");
          } else {
             if (verbose) {
                jamba::printDebug("freshenGenes(): ",
-                  "Using annLib entry as-is");
+                  "Using ann_lib entry as-is");
             }
-            itry <- get_anno_db(itry,
+            ienv <- get_anno_db(itry,
                verbose=verbose,
                ...);
-            itryname <- attr(itry, "annoname");
+            itryname <- attr(ienv, "annoname");
          }
-         if (length(itry) == 0) {
+         if (length(ienv) == 0) {
+            if (verbose) {
+               jamba::printDebug("freshenGenes(): ",
+                  "   Skipping", fgText=c("darkorange1", "red"));
+            }
             next;
          }
          
@@ -305,10 +323,26 @@ freshenGenes <- function
                ido <- (nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
             }
             ix <- x[[iname]][ido];
+            if (length(ix) == 0) {
+               if (verbose) {
+                  jamba::printDebug("freshenGenes(): ",
+                     "      Skipping because ", "0", " entries to query.",
+                     fgText=c("darkorange1", "red"));
+               }
+               next;
+            }
+            if (verbose) {
+               jamba::printDebug("freshenGenes(): ",
+                  "      Querying ",
+                  jamba::formatInt(length(ix)),
+                  " entries.",
+                  fgText=c("darkorange1", "aquamarine3"));
+            }
             ixu <- jamba::rmNA(as.character(unique(ix)));
             ivals_l <- AnnotationDbi::mget(ixu,
-               itry,
+               ienv,
                ifnotfound=NA);
+
             ## Data cleaning step to protect values which have delimiters
             if (protect_inline_sep && jamba::igrepHas(sep, unlist(ivals_l))) {
                ## convert to dummy '!:!'
@@ -405,8 +439,8 @@ freshenGenes <- function
    }
    
    ###################################
-   ## finalList
-   if (length(finalList) > 0) {
+   ## final
+   if (length(final) > 0) {
       xnames <- colnames(x);
       xnames <- jamba::makeNames(gsub("^found", 
          "intermediate", 
@@ -420,7 +454,7 @@ freshenGenes <- function
             x[["intermediate"]][isempty][isloc] <- gsub("^LOC", "", x[[1]][isempty][isloc]);
          }
       }
-      for (i in finalList) {
+      for (i in final) {
          if (verbose) {
             jamba::printDebug("final i:", i);
          }
@@ -428,9 +462,9 @@ freshenGenes <- function
             sep=sep,
             split=sep,
             handle_multiple=handle_multiple,
-            annLib=annLib,
-            tryList=i,
-            finalList=NULL,
+            ann_lib=ann_lib,
+            try_list=i,
+            final=NULL,
             ...);
          x[[i]] <- x1[["found"]];
          if (include_source) {
@@ -438,11 +472,11 @@ freshenGenes <- function
          }
       }
       if ("original" %in% empty_rule) {
-         ifinal <- head(finalList, 1);
+         ifinal <- head(final, 1);
          isempty <- (nchar(jamba::rmNA(naValue="", x[[ifinal]])) == 0);
          x[[ifinal]][isempty] <- x[[1]][isempty];
       } else if ("na" %in% empty_rule) {
-         ifinal <- head(finalList, 1);
+         ifinal <- head(final, 1);
          isempty <- (nchar(jamba::rmNA(naValue="", x[[ifinal]])) == 0);
          x[[ifinal]][isempty] <- NA;
       }
@@ -472,6 +506,13 @@ freshenGenes <- function
 #'    example the suffix `"2EG"` is used to indicate that annotation
 #'    returns Entrez gene. When annotation does not contain this suffix,
 #'    the annotation is reverse-mapped using `AnnotationDbi::revmap()`.
+#' @param ignore.case logical indicating whether to return an environment
+#'    after converting all keys to lowercase, which is one implementation
+#'    choice to provide case-insensitive output from `mget()`. In order
+#'    to fulfill the potential, the subsequent `mget()` must also
+#'    use `tolower(x)` on the input character vector. Note that this
+#'    option is currently fairly slow, and uses more memory while the
+#'    environment is loaded.
 #' @param verbose logical indicating whetheer to print verbose output.
 #' @param ... additional arguments are ignored.
 #' 
@@ -479,6 +520,7 @@ freshenGenes <- function
 get_anno_db <- function
 (x,
  revmap_suffix=c("2EG", "2ENTREZID", "2NAME"),
+ ignore.case=FALSE,
  verbose=FALSE,
  ...)
 {
@@ -495,10 +537,10 @@ get_anno_db <- function
          if (length(revmap_suffix) > 0 && nchar(revmap_suffix) > 0) {
             for (revmap_suffixi in revmap_suffix) {
                revmap_grep <- paste0(revmap_suffixi, "$");
-               if (jamba::igrepHas(revmap_grep, x)) {
-                  itryname <- gsub(revmap_grep, "", x);
+               if (jamba::igrepHas(revmap_suffixi, x)) {
+                  itryname <- gsub(revmap_suffixi, "", x);
                } else {
-                  itryname <- paste0(x, revmap_suffix);
+                  itryname <- paste0(x, revmap_suffixi);
                   if (better_exists(itryname)) {
                      break;
                   }
@@ -535,6 +577,12 @@ get_anno_db <- function
          collapse=".");
       attr(x, "annoname") <- itryname;
       itry <- x;
+   }
+   if (ignore.case) {
+      itry_l <- as.list(itry);
+      names(itry_l) <- tolower(names(itry_l));
+      itry <- as.environment(itry_l);
+      rm(itry_l);
    }
    return(itry);
 }
@@ -750,4 +798,92 @@ lgsub <- function
       names(x_out) <- names(x);
    }
    return(x_out);
+}
+
+#' Case-insensitive mget()
+#' 
+#' Case-insensitive mget()
+#' 
+#' This function is a lightweight wrapper around `base::mget()`
+#' (and generics) that intends to allow case-insensitive matching.
+#' It does so by converting all keys to lowercase, matching
+#' lowercase input to these lowercase keys, then using the original
+#' keys in native `base::mget()`.
+#' 
+#' One small change from `base::mget()` is the default
+#' argument `ifnotfound=NA`.
+#' 
+#' This function secretly runs `mget()` using the unique lowercase
+#' input values `x`, to reduce the number of queries. This implementation
+#' is designed to help with extremely long and potentially highly duplicated
+#' input values in `x`, in which case the change greatly reduces the time
+#' to return results.
+#' 
+#' Note: This function returns the first matching lowercase
+#' key, with the direct assumption that keys will not be duplicated
+#' after converting to lowercase. Should this assumption become a
+#' problem, please provide feedback and we will change the method
+#' accordingly.
+#' 
+#' Note: For unknown reasons, the R method dispatch was not
+#' behaving properly for objects of class `"AnnDbBimap"`, presumably
+#' because the generic functions `AnnotationDbi::ls()` and
+#' `AnnotationDbi::mget()` were written for class `"Bimap"`.
+#' So when the input `envir` class contains `"Bimap"` the
+#' direct function `AnnotationDbi::ls()` or
+#' `AnnotationDbi::mget()` is called, otherwise the generic
+#' `ls()` or `mget()` is called.
+#' 
+#' @return named `list` of objects found, or `NA` for objects
+#'    that are not found.
+#' 
+#' @family jam utility functions
+#' 
+#' @param x character vector of object names.
+#' @param envir,mode,ifnotfound,inherits arguments are passed to
+#'    `base:mget()`.
+#' 
+#' @export
+imget <- function
+(x,
+ envir=as.environment(-1L),
+ mode="any",
+ ifnotfound=NA,
+ inherits=FALSE,
+ verbose=FALSE,
+ ...)
+{
+   ##
+   if (jamba::igrepHas("Bimap", class(envir))) {
+      keys <- AnnotationDbi::ls(envir);
+   } else {
+      keys <- ls(envir);
+   }
+   xl <- tolower(x);
+   xlu <- unique(xl);
+   xmatch <- match(xl, xlu);
+   
+   ## Prepare an empty output list
+   valuesu <- as.list(rep(NA, length(xlu)));
+   names(valuesu) <- xlu;
+   
+   ## Match unique lowercase input to lowercase keys
+   keymatch <- match(xlu, tolower(keys));
+   keysfound <- !is.na(keymatch);
+   if (any(keysfound)) {
+      if (jamba::igrepHas("Bimap", class(envir))) {
+         valuesfound <- AnnotationDbi::mget(keys[keymatch[keysfound]],
+            envir, 
+            ifnotfound=ifnotfound,
+            inherits=inherits);
+      } else {
+         valuesfound <- mget(keys[keymatch[keysfound]],
+            envir, 
+            ifnotfound=ifnotfound,
+            inherits=inherits);
+      }
+      valuesu[keysfound] <- valuesfound;
+   }
+   values <- valuesu[xmatch];
+   values;
 }

@@ -1,13 +1,13 @@
 Package: genejam
 Title: Gene Jam
-Version: 0.0.10.900
+Version: 0.0.11.900
 Authors@R: person(given="James M.", family="Ward",
    email="jmw86069@gmail.com", role=c("aut", "cre"))
 Description: Gene annotation utility functions.
 biocViews:
 Depends: R (>= 3.6.0)
 Imports: jamba
-Suggests: org.Hs.eg.db
+Suggests: AnnotationDbi,org.Hs.eg.db
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
