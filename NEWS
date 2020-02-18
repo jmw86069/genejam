@@ -1,3 +1,26 @@
+# Version 0.0.10.900
+
+## New functions
+
+* `better_exists()` and `better_get()` which are (not so humbly)
+improved versions of `base::exists()` and `base::get()` respectively.
+Their sole benefit is to recognize a package prefix in an object name,
+so things like `better_exists("base::get")` will return TRUE since
+that object does exist; and subsequently `better_get("base::get")` will
+return that object. These functions are mostly useful when using
+annotation package prefixes such as `"KEGG.db::KEGGPATHID2NAME"`.
+I needed a simple way to test if it exists.
+`better_exists()` also allows multiple input values.
+
+## Changes to existing functions
+
+* `get_anno_db()` now calls `better_exists()` and `better_get()` which
+allows using a package prefix with annotation names.
+* `get_anno_db()` argument `"revmap_suffix"` now allows multiple
+possible values, it cycles through each until it finds a match, otherwise
+returns `NULL`. Some annotations use suffix `"2ENTREZID"` instead of
+`"2EG"`, and still others use `"2NAME"`. I'm sure there will be others.
+
 # Version 0.0.9.900
 
 ## Changes to existing functions

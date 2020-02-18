@@ -4,7 +4,12 @@
 \alias{get_anno_db}
 \title{Get annotation database or environment}
 \usage{
-get_anno_db(x, revmap_suffix = "2EG", verbose = FALSE, ...)
+get_anno_db(
+  x,
+  revmap_suffix = c("2EG", "2ENTREZID", "2NAME"),
+  verbose = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{character name of an annotation object, or an annotation

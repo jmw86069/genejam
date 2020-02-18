@@ -478,7 +478,7 @@ freshenGenes <- function
 #' @export
 get_anno_db <- function
 (x,
- revmap_suffix="2EG",
+ revmap_suffix=c("2EG", "2ENTREZID", "2NAME"),
  verbose=FALSE,
  ...)
 {
@@ -488,32 +488,40 @@ get_anno_db <- function
          jamba::printDebug("get_anno_db(): ",
             x);
       }
-      if (exists(x)) {
-         itry <- get(x);
-      } else {
+      flip_itryname <- function(x, revmap_suffix) {
+         ## This function tests if the reciprocal name exists,
+         ## and if so it returns that name.
+         ## Otherwise it returns NULL.
          if (length(revmap_suffix) > 0 && nchar(revmap_suffix) > 0) {
-            revmap_grep <- paste0(revmap_suffix, "$");
-            if (jamba::igrepHas(revmap_grep, x)) {
-               itryname <- gsub(revmap_grep, "", x);
-            } else {
-               itryname <- paste0(x, revmap_suffix);
+            for (revmap_suffixi in revmap_suffix) {
+               revmap_grep <- paste0(revmap_suffixi, "$");
+               if (jamba::igrepHas(revmap_grep, x)) {
+                  itryname <- gsub(revmap_grep, "", x);
+               } else {
+                  itryname <- paste0(x, revmap_suffix);
+                  if (better_exists(itryname)) {
+                     break;
+                  }
+                  itryname <- NULL;
+               }
             }
+         }
+         return(itryname);
+      }
+      if (better_exists(x)) {
+         ## If the name exists, return it directly
+         itry <- better_get(x);
+      } else {
+         ## If the name does not exist, test for the reciprocal name
+         reciprocal_x <- flip_itryname(x, revmap_suffix=revmap_suffix);
+         if (length(reciprocal_x) > 0) {
+            itry <- AnnotationDbi::revmap(better_get(reciprocal_x));
+         } else {
             if (verbose) {
                jamba::printDebug("get_anno_db(): ",
-                  "Applying revmap_suffix:",
-                  revmap_suffix,
-                  ", itryname:",
-                  itryname);
+                  "Not found on the search path.");
             }
-            if (exists(itryname)) {
-               itry <- AnnotationDbi::revmap(get(itryname));
-            } else {
-               if (verbose) {
-                  jamba::printDebug("get_anno_db(): ",
-                     "Not found on the search path.");
-               }
-               return(NULL);
-            }
+            return(NULL);
          }
       }
       attr(itry, "annoname") <- x;
@@ -529,6 +537,168 @@ get_anno_db <- function
       itry <- x;
    }
    return(itry);
+}
+
+#' Better exists()
+#' 
+#' Better exists()
+#' 
+#' @family jam utility functions
+#' 
+#' This function is a lightweight enhancement of `base::exists()`
+#' that accepts a package prefix in the object name, for example
+#' `"base::exists"`.
+#' 
+#' This function recognizes a package prefix `"packagename::"`
+#' and uses it to determine the correct value for argument `where`.
+#' If the package is not present in `search()` using the
+#' form `"package:packagename"` then an error is thrown.
+#' Otherwise if the package is on the search path, this
+#' function simply calls `base::exists(x, where=posnum, ...)`.
+#' 
+#' If the input `x` does not contain a package prefix, then
+#' this function simply calls `base::exists(x)`
+#' for the default behavior.
+#' 
+#' @return logical vector with length equal to `length(x)`. Note that
+#'    when a package prefix is supplied, when the package is not on
+#'    the search path this function returns `FALSE`, and does not
+#'    throw an error.
+#' 
+#' @param x character vector length 1 or more, indicating the
+#'    object names, with or without package prefix.
+#' @param where,mode,inherits arguments passed to `base::exists()`.
+#'    Note that arguments `envir` and `frame` use the defaults,
+#'    and therefore may not be compatible with using input `x`
+#'    with more than one value.
+#' @param ... additional arguments are passed to `base::exists()`.
+#' 
+#' #' @examples
+#' exists("exists", where="package:base")
+#' 
+#' better_exists("base::exists")
+#' 
+#' @export
+better_exists <- function
+(x,
+ where=-1,
+ mode="any",
+ inherits=TRUE,
+ verbose=FALSE,
+ ...)
+{
+   ##
+   if (length(x) > 1) {
+      where <- rep(where, length.out=length(x));
+      mode <- rep(mode, length.out=length(x));
+      inherits <- rep(inherits, length.out=length(x));
+      be_result <- sapply(seq_along(x), function(xi){
+         better_exists(x[[xi]],
+            where=where[[xi]],
+            mode=mode[[xi]],
+            inherits=inherits[[xi]],
+            ...);
+      });
+      return(be_result);
+   }
+   if (jamba::igrepHas("^.+::.+$", x)) {
+      xpackage <- paste0("package:", gsub("^(.+)::(.+)$", "\\1", x));
+      xbase <- gsub("^(.+)::(.+)$", "\\2", x);
+      xpos <- jamba::rmNA(match(xpackage, search()));
+      if (verbose) {
+         jamba::printDebug("better_exists(): ",
+            "xpackage:", xpackage);
+         jamba::printDebug("better_exists(): ",
+            "xbase:", xbase);
+         jamba::printDebug("better_exists(): ",
+            "xpos:", xpos);
+      }
+      if (length(xpos) == 0) {
+         return(FALSE);
+         stop(paste0("better_exists(): There is no package called '", 
+            xpackage, 
+            "' on the search() list."));
+      }
+      base::exists(xbase,
+         where=xpos, 
+         mode=mode,
+         inherits=inherits,
+         ...);
+   } else {
+      base::exists(x,
+         where=where,
+         mode=mode,
+         inherits=inherits,
+         ...);
+   }
+}
+
+#' Better get()
+#' 
+#' Better get()
+#' 
+#' @family jam utility functions
+#' 
+#' This function is a lightweight enhancement of `base::get()`
+#' that accepts a package prefix in the object name, for example
+#' `"base::exists"`.
+#' 
+#' This function recognizes a package prefix `"packagename::"`
+#' and uses it to determine the correct value for argument `where`.
+#' If the package is not present in `search()` using the
+#' form `"package:packagename"` then an error is thrown.
+#' Otherwise if the package is on the search path, this
+#' function simply calls `base::get(x, pos=posnum, ...)`.
+#' 
+#' If the input `x` does not contain a package prefix, then
+#' this function simply calls `base::get()`
+#' for the default behavior.
+#' 
+#' @return the R object found. If not object is found an error results.
+#' 
+#' @param character string with an R object name, with or without
+#'    an R package prefix. Note that only one value is recognized.
+#' @param pos,mode,inherits arguments passed to `base::get()`. Note
+#'    that argument `envir` is not passed to `base::get()`, since
+#'    it is typically defined dynamically by that function.
+#' @param ... additional arguments are passed to `base::get()`. The
+#'    only additional argument is `envir` which is not recommended,
+#'    but is here for compatibility with the base functionality.
+#' 
+#' @examples 
+#' get("get", pos="package:base")
+#' 
+#' better_get("base::get")
+#' 
+#' @export
+better_get <- function
+(x,
+ pos=-1L,
+ mode="any",
+ inherits=TRUE,
+ ...)
+{
+   if (jamba::igrepHas("^.+::.+$", x)) {
+      xpackage <- paste0("package:", gsub("^(.+)::(.+)$", "\\1", x));
+      xbase <- gsub("^(.+)::(.+)$", "\\2", x);
+      xpos <- match(xpackage, search());
+      if (length(xpos) == 0) {
+         stop(paste0("better_get(): There is no package called '", 
+            xpackage, 
+            "' on the search() list."));
+      }
+      base::get(xbase,
+         pos=xpos, 
+         mode=mode,
+         inherits=inherits,
+         ...);
+   } else {
+      base::get(x,
+         pos=pos,
+         mode=mode,
+         inherits=inherits,
+         ...);
+   }
 }
 
 #' Pattern replacement in a list of character vectors
