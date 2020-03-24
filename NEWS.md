@@ -1,3 +1,12 @@
+# Version 0.0.12.900
+
+## Changes to existing functions
+
+* `get_anno_db()` logic to check for reciprocal annotation names
+was updated to cover more scenarios. Specifically, `"org.Hs.egUNIPROT2EG"`
+is properly recognized, it previously was not being recognized by
+the reciprocal `"org.Hs.egUNIPROT"` and therefore was being skipped.
+
 # Version 0.0.11.900
 
 ## Changes to existing functions

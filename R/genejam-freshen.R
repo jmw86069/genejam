@@ -530,22 +530,36 @@ get_anno_db <- function
          jamba::printDebug("get_anno_db(): ",
             x);
       }
-      flip_itryname <- function(x, revmap_suffix) {
+      flip_itryname <- function(x, revmap_suffix, verbose=FALSE) {
          ## This function tests if the reciprocal name exists,
          ## and if so it returns that name.
          ## Otherwise it returns NULL.
-         if (length(revmap_suffix) > 0 && nchar(revmap_suffix) > 0) {
-            for (revmap_suffixi in revmap_suffix) {
-               revmap_grep <- paste0(revmap_suffixi, "$");
-               if (jamba::igrepHas(revmap_suffixi, x)) {
-                  itryname <- gsub(revmap_suffixi, "", x);
-               } else {
-                  itryname <- paste0(x, revmap_suffixi);
-                  if (better_exists(itryname)) {
-                     break;
-                  }
+         itryname <- NULL;
+         if (length(revmap_suffix) > 0 && any(nchar(revmap_suffix) > 0)) {
+            revmap_suffix <- revmap_suffix[nchar(revmap_suffix) > 0];
+            revmap_anygrep <- paste0("(",
+               jamba::cPaste(revmap_suffix, 
+                  sep="|"), 
+               ")$");
+            if (jamba::igrepHas(revmap_anygrep, x)) {
+               ## one of the revmap extensions exists as a suffix, remove it
+               itryname <- gsub(revmap_anygrep, "", x);
+               if (!better_exists(itryname)) {
                   itryname <- NULL;
                }
+               return(itryname);
+            }
+            for (revmap_suffixi in revmap_suffix) {
+               itryname <- paste0(x, revmap_suffixi);
+               if (verbose) {
+                  jamba::printDebug("flip_itryname(): ",
+                     "itryname:",
+                     itryname);
+               }
+               if (better_exists(itryname)) {
+                  return(itryname);
+               }
+               itryname <- NULL;
             }
          }
          return(itryname);
@@ -555,7 +569,9 @@ get_anno_db <- function
          itry <- better_get(x);
       } else {
          ## If the name does not exist, test for the reciprocal name
-         reciprocal_x <- flip_itryname(x, revmap_suffix=revmap_suffix);
+         reciprocal_x <- flip_itryname(x,
+            revmap_suffix=revmap_suffix,
+            verbose=verbose);
          if (length(reciprocal_x) > 0) {
             itry <- AnnotationDbi::revmap(better_get(reciprocal_x));
          } else {
