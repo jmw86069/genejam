@@ -1,5 +1,7 @@
 ---
-   output: github_document
+  output:
+    github_document:
+      df_print: kable
 ---
    
    <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -20,9 +22,38 @@ comparing genes in two datasets, for example when those datasets
 may not be using the same gene symbols to represent equivalent
 genes.
 
+## Installation
+
+Install using the `remotes` package:
+
+`remotes::install_github("jmw86069/genejam")`
+
+Note: It is recommended not to use the `devtools` package to
+install Github packages, mostly because the `devtools` package
+has many more components than are required for installation.
+Instead, `devtools` includes all components needed to develop
+R packages, beyond the scope of installing one such R package.
+
+## Basic usage
+
+The simplest use is to supply a set of gene symbols:
+
 ```{r, genejam_1}
 genejam::freshenGenes(c("APOE", "APOA", "HIST1H1C"))
 ```
+
+For slightly more detail, you can edit the argument `final`
+to include things like `"SYMBOL"` (default), `"GENENAME"`,
+`"ALIAS"`, `"ACCNUM"`, and more.
+
+```{r, genejam_2}
+genejam::freshenGenes(c("APOE", "APOA", "HIST1H1C"),
+   final=c("SYMBOL", 
+      "GENENAME",
+      "ALIAS"))
+```
+
+## Comments on usefulness
 
 Specifically, in December 2019 the gene nomenclature for the large
 histone gene family was changed, so the gene symbol `"HIST1H1C"` from
