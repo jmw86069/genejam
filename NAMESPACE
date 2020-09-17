@@ -3,6 +3,8 @@
 export(better_exists)
 export(better_get)
 export(freshenGenes)
+export(freshenGenes2)
+export(freshenGenes3)
 export(get_anno_db)
 export(imget)
 export(lgsub)

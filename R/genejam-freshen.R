@@ -257,10 +257,16 @@ freshenGenes <- function
          })));
    }
    xnames <- colnames(x);
-   x[["found"]] <- rep("", nrow(x));
-   x[["found_source"]] <- rep("", nrow(x));
-   if ("first_try" %in% handle_multiple) {
-      x[["found_try"]] <- rep(TRUE, nrow(x));
+   if (length(try_list) > 0) {
+      if (!"found" %in% colnames(x)) {
+         x[["found"]] <- rep("", nrow(x));
+      }
+      if (!"found_source" %in% colnames(x)) {
+         x[["found_source"]] <- rep("", nrow(x));
+         if ("first_try" %in% handle_multiple) {
+            x[["found_try"]] <- rep(TRUE, nrow(x));
+         }
+      }
    }
 
    ## Iterate each column to find a match
@@ -404,14 +410,17 @@ freshenGenes <- function
    
    ###################################
    ## Make found values unique
-   xfoundu <- unique(x[["found"]]);
-   if (length(split) > 0 && nchar(split) > 0) {
-      xfounduv <- jamba::cPasteSU(strsplit(xfoundu, split),
-         sep=sep);
-   } else {
-      xfounduv <- xfoundu;
+   if ("found" %in% colnames(x) && any(nchar(x[["found"]]) > 0)) {
+      xfoundu <- unique(x[["found"]]);
+      if (length(split) > 0 && nchar(split) > 0) {
+         xfounduv <- jamba::cPasteSU(strsplit(xfoundu, split),
+            sep=sep);
+      } else {
+         xfounduv <- xfoundu;
+      }
+      x[["found"]] <- xfounduv[match(x[["found"]], xfoundu)];
    }
-   x[["found"]] <- xfounduv[match(x[["found"]], xfoundu)];
+   
    ## Revert protected sep values
    if (protect_inline_sep && jamba::igrepHas("!:!", x[["found"]])) {
       ## convert from dummy '!:!' to sep
@@ -442,9 +451,11 @@ freshenGenes <- function
    ## final
    if (length(final) > 0) {
       xnames <- colnames(x);
-      xnames <- jamba::makeNames(gsub("^found", 
-         "intermediate", 
-         xnames));
+      xnames <- jamba::makeNames(
+         gsub("^found", 
+            "intermediate",
+            xnames),
+         renameFirst=FALSE);
       colnames(x) <- xnames;
       ## LOC# recovery
       isempty <- (nchar(jamba::rmNA(naValue="", x[["intermediate"]])) == 0);

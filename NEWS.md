@@ -1,3 +1,17 @@
+# Version 0.0.13.900
+
+## new functions
+
+These two new functions are convenience functions.
+I often find myself wanting the gene symbol and
+long gene name, so now `freshenGenes2()` does that by default.
+To add gene aliases, use `freshenGenes3()`.
+
+* `freshenGenes2()` is a simple extension to `freshenGenes()` that
+has `"SYMBOL", "GENENAME"` in the output by default.
+* `freshenGenes3()` is a simple extension to `freshenGenes()` that
+has `"SYMBOL", "GENENAME", "ALIAS"` in the output by default.
+
 # Version 0.0.12.900
 
 ## Changes to existing functions

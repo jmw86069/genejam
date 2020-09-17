@@ -67,7 +67,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">genejam</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.11.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.13.900</span>
       </span>
     </div>
 
@@ -81,6 +81,9 @@
 </li>
 <li>
   <a href="reference/index.html">Reference</a>
+</li>
+<li>
+  <a href="news/index.html">Changelog</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -136,8 +139,7 @@
 <h3 class="hasAnchor">
 <a href="#suggested-mechanism" class="anchor"></a>Suggested mechanism</h3>
 <ul>
-<li>
-<code>asis_colnames=c("ENTREZID","EG")</code> would define colnames <code><a href="https://rdrr.io/r/base/c.html">c("ENTREZID","EG")</a></code> as “ASIS” which means they are not to be queried.</li>
+<li><p><code>asis_colnames=c("ENTREZID","EG")</code> would define colnames <code><a href="https://rdrr.io/r/base/c.html">c("ENTREZID","EG")</a></code> as “ASIS” which means they are not to be queried.</p></li>
 <li>
 <p><code>ann_lib=c("ASIS", "SYMBOL2EG", "ALIAS2EG")</code> would process in order:</p>
 <ol>
@@ -146,13 +148,15 @@
 <li>query <code>"ALIAS2EG"</code> using all columns except <code>asis_colnames</code>.</li>
 </ol>
 </li>
-<li><p><code>ann_lib=c("SYMBOL2EG", "ASIS", "ALIAS2EG")</code> would process in order:</p></li>
-</ul>
+<li>
+<p><code>ann_lib=c("SYMBOL2EG", "ASIS", "ALIAS2EG")</code> would process in order:</p>
 <ol>
 <li>query <code>"SYMBOL2EG"</code> using all columns except <code>asis_colnames</code>.</li>
 <li>Populate <code>"intermediate"</code> with delimited values from the <code>asis_colnames</code> using rules defined by <code>handle_multiple</code>. That is, when <code>handle_multiple="first_try"</code> then only rows with empty values in `“intermediate” column will be populated.</li>
 <li>query <code>"ALIAS2EG"</code> using all columns except <code>asis_colnames</code>.</li>
 </ol>
+</li>
+</ul>
 </div>
 </div>
 </div>

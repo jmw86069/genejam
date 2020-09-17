@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">genejam</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.11.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.13.900</span>
       </span>
     </div>
 
@@ -45,6 +45,9 @@
 </li>
 <li>
   <a href="reference/index.html">Reference</a>
+</li>
+<li>
+  <a href="news/index.html">Changelog</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
@@ -68,12 +71,99 @@
   <div class="contents col-md-9">
 
 <p>Genejam is intended to freshen gene annotations to the current official standard. It is particularly useful when comparing genes in two datasets, for example when those datasets may not be using the same gene symbols to represent equivalent genes.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">genejam<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/genejam/man/freshenGenes.html">freshenGenes</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"APOE"</span>, <span class="st">"APOA"</span>, <span class="st">"HIST1H1C"</span>))
-<span class="co">#&gt;      input intermediate SYMBOL</span>
-<span class="co">#&gt; 1     APOE          348   APOE</span>
-<span class="co">#&gt; 2     APOA         4018    LPA</span>
-<span class="co">#&gt; 3 HIST1H1C         3006   H1-2</span></code></pre></div>
+<div id="installation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#installation" class="anchor"></a>Installation</h2>
+<p>Install using the <code>remotes</code> package:</p>
+<p><code><a href="https://rdrr.io/pkg/remotes/man/install_github.html">remotes::install_github("jmw86069/genejam")</a></code></p>
+<p>Note: It is recommended not to use the <code>devtools</code> package to install Github packages, mostly because the <code>devtools</code> package has many more components than are required for installation. Instead, <code>devtools</code> includes all components needed to develop R packages, beyond the scope of installing one such R package.</p>
+</div>
+<div id="freshengenes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#freshengenes" class="anchor"></a>freshenGenes()</h2>
+<p>The simplest use is to supply a set of gene symbols:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>genejam<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/genejam/man/freshenGenes.html">freshenGenes</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"APOE"</span>, <span class="st">"APOA"</span>, <span class="st">"HIST1H1C"</span>))</span></code></pre></div>
+<div class="kable-table">
+
+| input    | intermediate | SYMBOL |
+| :------- | :----------- | :----- |
+| APOE     | 348          | APOE   |
+| APOA     | 4018         | LPA    |
+| HIST1H1C | 3006         | H1-2   |
+
+</div>
+<p>For slightly more detail, you can edit the argument <code>final</code> to include things like <code>"SYMBOL"</code> (default), <code>"GENENAME"</code>, <code>"ALIAS"</code>, <code>"ACCNUM"</code>, and more.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>genejam<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/genejam/man/freshenGenes.html">freshenGenes</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"APOE"</span>, <span class="st">"APOA"</span>, <span class="st">"HIST1H1C"</span>),</span>
+<span id="cb2-2"><a href="#cb2-2"></a>   <span class="dt">final=</span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"SYMBOL"</span>, </span>
+<span id="cb2-3"><a href="#cb2-3"></a>      <span class="st">"GENENAME"</span>,</span>
+<span id="cb2-4"><a href="#cb2-4"></a>      <span class="st">"ALIAS"</span>))</span></code></pre></div>
+<div class="kable-table">
+
+| input    | intermediate | SYMBOL | GENENAME                            | ALIAS                             |
+| :------- | :----------- | :----- | :---------------------------------- | :-------------------------------- |
+| APOE     | 348          | APOE   | apolipoprotein E                    | AD2,APO-E,ApoE4,APOE,LDLCQ5,LPG   |
+| APOA     | 4018         | LPA    | lipoprotein(a)                      | AK38,APOA,LP,LPA                  |
+| HIST1H1C | 3006         | H1-2   | H1.2 linker histone, cluster member | H1-2,H1.2,H1C,H1F2,H1s-1,HIST1H1C |
+
+</div>
+</div>
+<div id="convenience-function-freshengenes2" class="section level2">
+<h2 class="hasAnchor">
+<a href="#convenience-function-freshengenes2" class="anchor"></a>Convenience function freshenGenes2()</h2>
+<p>I frequently find myself wanting gene symbol, and the long gene name, so I created a simple function <code><a href="reference/freshenGenes2.html">freshenGenes2()</a></code> that uses default argument <code>final=c("SYMBOL", "GENENAME")</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>genejam<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/genejam/man/freshenGenes2.html">freshenGenes2</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"APOE"</span>, <span class="st">"APOA"</span>, <span class="st">"HIST1H1C"</span>))</span></code></pre></div>
+<div class="kable-table">
+
+| input    | intermediate | SYMBOL | GENENAME                            |
+| :------- | :----------- | :----- | :---------------------------------- |
+| APOE     | 348          | APOE   | apolipoprotein E                    |
+| APOA     | 4018         | LPA    | lipoprotein(a)                      |
+| HIST1H1C | 3006         | H1-2   | H1.2 linker histone, cluster member |
+
+</div>
+</div>
+<div id="convenience-function-freshengenes3" class="section level2">
+<h2 class="hasAnchor">
+<a href="#convenience-function-freshengenes3" class="anchor"></a>Convenience function freshenGenes3()</h2>
+<p>The other common use case is to include other gene aliases, with the function <code><a href="reference/freshenGenes3.html">freshenGenes3()</a></code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>genejam<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/genejam/man/freshenGenes3.html">freshenGenes3</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"APOE"</span>, <span class="st">"APOA"</span>, <span class="st">"HIST1H1C"</span>))</span></code></pre></div>
+<div class="kable-table">
+
+| input    | intermediate | SYMBOL | GENENAME                            | ALIAS                             |
+| :------- | :----------- | :----- | :---------------------------------- | :-------------------------------- |
+| APOE     | 348          | APOE   | apolipoprotein E                    | AD2,APO-E,ApoE4,APOE,LDLCQ5,LPG   |
+| APOA     | 4018         | LPA    | lipoprotein(a)                      | AK38,APOA,LP,LPA                  |
+| HIST1H1C | 3006         | H1-2   | H1.2 linker histone, cluster member | H1-2,H1.2,H1C,H1F2,H1s-1,HIST1H1C |
+
+</div>
+</div>
+<div id="slightly-more-advanced" class="section level2">
+<h2 class="hasAnchor">
+<a href="#slightly-more-advanced" class="anchor"></a>Slightly more advanced</h2>
+<p>What if you already have Entrez gene ID, and want associated annotations? The function <code><a href="reference/freshenGenes.html">freshenGenes()</a></code> runs two steps:</p>
+<ol>
+<li>convert input to <code>"intermediate"</code> (which is the Entrez gene ID)</li>
+<li>convert <code>"intermediate"</code> to the output defined by <code>final</code>, for example <code>final=c("SYMBOL")</code>.</li>
+</ol>
+<p>In this case, you already have <code>"intermediate"</code>, so you invoke the function with a <code>data.frame</code> with values in a column named <code>"intermediate"</code>, and set <code>try_list=NULL</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>df &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="dt">intermediate=</span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"348"</span>, <span class="st">"4018"</span>, <span class="st">"3006"</span>, <span class="st">"100"</span>));</span>
+<span id="cb5-2"><a href="#cb5-2"></a>genejam<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/genejam/man/freshenGenes2.html">freshenGenes2</a></span>(<span class="dt">x=</span>df, <span class="dt">try_list=</span><span class="ot">NULL</span>)</span></code></pre></div>
+<div class="kable-table">
+
+| intermediate | SYMBOL | GENENAME                            |
+| :----------- | :----- | :---------------------------------- |
+| 348          | APOE   | apolipoprotein E                    |
+| 4018         | LPA    | lipoprotein(a)                      |
+| 3006         | H1-2   | H1.2 linker histone, cluster member |
+| 100          | ADA    | adenosine deaminase                 |
+
+</div>
+</div>
+<div id="comments-on-usefulness" class="section level2">
+<h2 class="hasAnchor">
+<a href="#comments-on-usefulness" class="anchor"></a>Comments on usefulness</h2>
 <p>Specifically, in December 2019 the gene nomenclature for the large histone gene family was changed, so the gene symbol <code>"HIST1H1C"</code> from November 2019 is now called <code>"H1-2"</code> in December 2019 and thereafter. These gene nomenclature updates happen frequently (perhaps monthly), and apparently any gene symbol can be updated. So when we compare a gene list created today, to any gene list not created today, we run <code><a href="reference/freshenGenes.html">freshenGenes()</a></code> on each gene list to ensure they both use the same, “most current” gene annotation.</p>
+</div>
 <div id="package-reference" class="section level2">
 <h2 class="hasAnchor">
 <a href="#package-reference" class="anchor"></a>Package Reference</h2>

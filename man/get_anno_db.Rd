@@ -48,6 +48,8 @@ reverse mapped annotation object is returned.
 }
 \seealso{
 Other genejam: 
+\code{\link{freshenGenes2}()},
+\code{\link{freshenGenes3}()},
 \code{\link{freshenGenes}()}
 }
 \concept{genejam}

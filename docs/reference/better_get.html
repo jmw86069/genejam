@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">genejam</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.11.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.13.900</span>
       </span>
     </div>
 
@@ -83,6 +83,9 @@
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
+</li>
+<li>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -146,12 +149,12 @@ an R package prefix. Note that only one value is recognized.</p></td>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/get.html'>get</a></span>(<span class='st'>"get"</span>, <span class='kw'>pos</span><span class='kw'>=</span><span class='st'>"package:base"</span>)</div><div class='output co'>#&gt; function (x, pos = -1L, envir = as.environment(pos), mode = "any", 
 #&gt;     inherits = TRUE) 
 #&gt; .Internal(get(x, envir, mode, inherits))
-#&gt; &lt;bytecode: 0x7fb7d072ad68&gt;
+#&gt; &lt;bytecode: 0x7fd202e1da58&gt;
 #&gt; &lt;environment: namespace:base&gt;</div><div class='input'>
 <span class='fu'>better_get</span>(<span class='st'>"base::get"</span>)</div><div class='output co'>#&gt; function (x, pos = -1L, envir = as.environment(pos), mode = "any", 
 #&gt;     inherits = TRUE) 
 #&gt; .Internal(get(x, envir, mode, inherits))
-#&gt; &lt;bytecode: 0x7fb7d072ad68&gt;
+#&gt; &lt;bytecode: 0x7fd202e1da58&gt;
 #&gt; &lt;environment: namespace:base&gt;</div><div class='input'>
 </div></pre>
   </div>
