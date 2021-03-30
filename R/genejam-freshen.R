@@ -41,6 +41,9 @@
 #' For each step, the annotation matched can be returned, as an audit
 #' trail to see which annotation was available for each input entry.
 #' 
+#' Note that if the input data already contains Entrez gene ID
+#' values, you can define that colname with argument `intermediate`.
+#' 
 #' @return `data.frame` with one or more columns indicating the input
 #' data, then a column `"intermediate"` containing the Entrez gene ID
 #' that was matched, then one column for each item in `final`,
@@ -105,6 +108,12 @@
 #'    not separate multiple separate values, so they should not be
 #'    used to split a string like `"H4 clustered histone 10, pseudogene"`
 #'    into two strings `"H4 clustered histone 10"` and `"pseudogene"`.
+#' @param intermediate `character` string with colname in `x` that
+#'    contains intermediate values. These values are expected from output
+#'    of the first step in the workflow, for example `"SYMBOL2EG"`
+#'    returns Entrez gene values, so if the input `x` already contains
+#'    some of these values in a column, assign that colname to
+#'    `intermediate`.
 #' @param verbose logical indicating whether to print verbose output.
 #' 
 #' @examples
@@ -155,6 +164,7 @@ freshenGenes <- function
  empty_rule=c("empty", "original", "na"),
  include_source=FALSE,
  protect_inline_sep=TRUE,
+ intermediate="intermediate",
  verbose=FALSE,
  ...)
 {
@@ -180,6 +190,14 @@ freshenGenes <- function
    if (length(colnames(x)) == 0) {
       colnames(x) <- jamba::makeNames(rep("input", ncol(x)));
    }
+   
+   ## colnames_x are the colnames(x) that are not intermediate
+   intermediate_source <- paste0(intermediate, "_source");
+   colnames_x <- setdiff(colnames(x),
+      c(intermediate, intermediate_source));
+   ## ncol_x is the number of columns that are not intermediate
+   ncol_x <- length(colnames_x);
+   
    ## handle_multiple="best_each"
    if ("best_each" %in% handle_multiple) {
       if (verbose) {
@@ -187,23 +205,30 @@ freshenGenes <- function
             "handle_multiple:",
             handle_multiple);
       }
-      if (ncol(x) == 1) {
+      if (ncol_x == 1) {
          ## Check for delimited values
-         if (length(split) > 0 && jamba::igrepHas(split, x[[1]])) {
+         if (length(split) > 0 && nchar(split) > 0 && jamba::igrepHas(split, x[[colnames_x]])) {
             ## Split the input by delimiter
-            taller_list <- strsplit(x[[1]], split);
+            taller_list <- strsplit(x[[colnames_x]], split);
+            # 30mar2021: fill NULL with "" so the original empty entry is not lost
+            taller_list[lengths(taller_list) == 0] <- "";
             ## Make a vector and associated factor to split back into a list
-            taller_vector <- unlist(taller_list);
+            taller_idx <- rep(seq_along(taller_list),
+               lengths(taller_list));
             taller_factor <- rep(factor(seq_along(taller_list)),
                lengths(taller_list));
+            taller_x <- x[taller_idx,,drop=FALSE];
+            taller_x[[colnames_x]] <- unlist(taller_list);
+            #taller_vector <- unlist(taller_list);
          } else {
-            taller_vector <- x[[1]];
+            taller_x <- x;
+            #taller_vector <- x[[colnames_x]];
             taller_factor <- NULL;
          }
          ## run freshenGenes()
          ## empty_rule="na" here so blank entries will get dropped
          ## then we can replace as needed later
-         taller_freshened <- freshenGenes(x=taller_vector,
+         taller_freshened <- freshenGenes(x=taller_x,
             ann_lib=ann_lib,
             try_list=try_list,
             final=final,
@@ -213,15 +238,18 @@ freshenGenes <- function
             empty_rule="na",
             include_source=include_source,
             protect_inline_sep=protect_inline_sep,
+            intermediate=intermediate,
             verbose=FALSE);
          ## Split back into the original vector
          if (length(taller_factor) == 0) {
             return(taller_freshened);
          }
-         final_colnames <- jamba::provigrep(c(final,
-            "^intermediate",
-            "_source$"),
-            colnames(taller_freshened));
+         # 30mar2021: this chunk was ignored, commenting out
+         #final_colnames <- jamba::provigrep(c(final,
+         #   #"^intermediate",
+         #   intermediate,
+         #   "_source$"),
+         #   colnames(taller_freshened));
          final_colnames <- colnames(taller_freshened);
          x_new <- do.call(cbind, lapply(jamba::nameVector(final_colnames), function(i){
             taller_freshened_split <- split(taller_freshened[[i]],
@@ -234,42 +262,62 @@ freshenGenes <- function
                   na.rm=TRUE));
             colnames(idf) <- i;
             idf;
-            
          }));
          return(x_new);
       }
    }
    
    ## Expand columns containing delimited values if necessary
+   # This step makes multiple values appear in separate columns
+   # on the same row.
    if (length(split) > 0 && nchar(split) > 0) {
       x <- data.frame(stringsAsFactors=FALSE,
          check.names=FALSE,
          do.call(cbind,
-         lapply(jamba::nameVector(colnames(x)), function(i){
-            ix <- as.character(x[[i]]);
-            if (jamba::igrepHas(split, ix)) {
-               ix <- jamba::rbindList(
-                  jamba::rmNULL(strsplit(as.character(ix), split),
-                     nullValue=""));
-               colnames(ix) <- jamba::makeNames(rep(i, ncol(ix)));
-            }
-            ix;
-         })));
+            lapply(jamba::nameVector(colnames(x)), function(i){
+               ix <- as.character(x[[i]]);
+               # only split delimited values when it is not intermediate
+               # note that empty entries are filled with ""
+               if (i %in% colnames_x) {
+                  if (jamba::igrepHas(split, ix)) {
+                     ix <- jamba::rbindList(
+                        jamba::rmNULL(strsplit(as.character(ix), split),
+                           nullValue=""));
+                     colnames(ix) <- jamba::makeNames(rep(i, ncol(ix)));
+                  }
+               }
+               ix;
+            })
+         )
+      );
    }
-   xnames <- colnames(x);
+   # updated to ignore intermediate and intermediate_source
+   xnames <- setdiff(colnames(x),
+      c(intermediate, intermediate_source));
+
    if (length(try_list) > 0) {
-      if (!"found" %in% colnames(x)) {
-         x[["found"]] <- rep("", nrow(x));
+      # 30mar2021: port from "found" to intermediate
+      #if (!"found" %in% colnames(x)) {
+      #   x[["found"]] <- rep("", nrow(x));
+      #}
+      if (!intermediate %in% colnames(x)) {
+         x[[intermediate]] <- rep("", nrow(x));
       }
-      if (!"found_source" %in% colnames(x)) {
-         x[["found_source"]] <- rep("", nrow(x));
+      # 30mar2021: port from "found_source" to intermediate_source
+      #if (!"found_source" %in% colnames(x)) {
+      #   x[["found_source"]] <- rep("", nrow(x));
+      #   if ("first_try" %in% handle_multiple) {
+      #      x[["found_try"]] <- rep(TRUE, nrow(x));
+      #   }
+      #}
+      if (!intermediate_source %in% colnames(x)) {
+         x[[intermediate_source]] <- rep("", nrow(x));
          if ("first_try" %in% handle_multiple) {
             x[["found_try"]] <- rep(TRUE, nrow(x));
          }
       }
    }
 
-   ## Iterate each column to find a match
    for (itry in try_list) {
       for (iann in ann_lib) {
          if (verbose) {
@@ -312,21 +360,27 @@ freshenGenes <- function
                   "   iname:",
                   iname);
             }
-            ifound <- x[["found"]];
-            ifound_source <- x[["found_source"]];
+            #ifound <- x[["found"]];
+            #ifound_source <- x[["found_source"]];
+            ifound <- x[[intermediate]];
+            ifound_source <- x[[intermediate_source]];
             if ("first_hit" %in% handle_multiple) {
                ## input must have characters
                ## must have no found result
-               ido <- (nchar(jamba::rmNA(naValue="", ifound)) == 0 &
-                     nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
+               #ido <- (nchar(jamba::rmNA(naValue="", ifound)) == 0 &
+               #      nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
+               ido <- (genejam::is_empty(ifound) &
+                     !genejam::is_empty(x[[iname]]))
             } else if ("first_try" %in% handle_multiple) {
                ## input must have characters
                ## previous try must have no result
                ido <- (x[["found_try"]] &
-                     nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
+                     !genejam::is_empty(x[[iname]]));
+                     #nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
             } else {
-               ## input must have characters
-               ido <- (nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
+               ## input must have characters, and not be empty
+               #ido <- (nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
+               ido <- !genejam::is_empty(x[[iname]]);
             }
             ix <- x[[iname]][ido];
             if (length(ix) == 0) {
@@ -373,11 +427,15 @@ freshenGenes <- function
             ixdo <- (nchar(ixnew) > 0);
             
             iname_tryname <- itryname;
-            if (any(c("first_try","all") %in% handle_multiple)) {
+            if (any(c("first_try", "all") %in% handle_multiple)) {
+               # fix slight bug in handling ifound_source=""
+               # that would create output like ",source_name"
                ifound_source[ido][ixdo] <- ifelse(
                   nchar(ifound[ido][ixdo]) == 0,
                   iname_tryname,
-                  paste0(ifound_source[ido][ixdo], sep, iname_tryname));
+                  ifelse(nchar(ifound_source[ido][ixdo]) == 0,
+                     iname_tryname,
+                     paste0(ifound_source[ido][ixdo], sep, iname_tryname)));
                ifound[ido][ixdo] <- ifelse(
                   nchar(ifound[ido][ixdo]) == 0,
                   ixnew[ixdo],
@@ -386,12 +444,12 @@ freshenGenes <- function
                ifound[ido][ixdo] <- ixnew[ixdo];
                ifound_source[ido][ixdo] <- iname_tryname;
             }
-            x[["found"]] <- ifound;
-            x[["found_source"]] <- ifound_source;
+            x[[intermediate]] <- ifound;
+            x[[intermediate_source]] <- ifound_source;
          }
          if ("first_try" %in% handle_multiple) {
-            isnonempty <- (nchar(jamba::rmNA(naValue="", x[["found"]])) > 0);
-            x[["found_try"]][isnonempty] <- FALSE;
+            isempty <- genejam::is_empty(x[[intermediate]]);
+            x[["found_try"]][!isempty] <- FALSE;
          }
       }
    }
@@ -405,24 +463,25 @@ freshenGenes <- function
    ###################################
    ## Optionally remove found_source
    if (!include_source) {
-      x <- x[,setdiff(colnames(x), "found_source"),drop=FALSE];
+      x <- x[,setdiff(colnames(x), intermediate_source),drop=FALSE];
    }
    
    ###################################
-   ## Make found values unique
-   if ("found" %in% colnames(x) && any(nchar(x[["found"]]) > 0)) {
-      xfoundu <- unique(x[["found"]]);
+   ## Make intermediate values unique
+   ## also this step sorts delimited values
+   if (intermediate %in% colnames(x) && any(nchar(x[[intermediate]]) > 0)) {
+      xfoundu <- unique(x[[intermediate]]);
       if (length(split) > 0 && nchar(split) > 0) {
          xfounduv <- jamba::cPasteSU(strsplit(xfoundu, split),
             sep=sep);
       } else {
          xfounduv <- xfoundu;
       }
-      x[["found"]] <- xfounduv[match(x[["found"]], xfoundu)];
+      x[[intermediate]] <- xfounduv[match(x[[intermediate]], xfoundu)];
    }
    
    ## Revert protected sep values
-   if (protect_inline_sep && jamba::igrepHas("!:!", x[["found"]])) {
+   if (protect_inline_sep && jamba::igrepHas("!:!", x[[intermediate]])) {
       ## convert from dummy '!:!' to sep
       if (verbose) {
          jamba::printDebug("freshenGenes(): ",
@@ -432,63 +491,107 @@ freshenGenes <- function
             sep, 
             "'");
       }
-      x[["found"]] <- gsub("!:!", sep, x[["found"]]);
+      x[[intermediate]] <- gsub("!:!", sep, x[[intermediate]]);
    }
    
    ## make found_source values unique, if they are retained in output
-   if (include_source) {
-      xfoundsu <- unique(x[["found_source"]]);
+   if (include_source && intermediate_source %in% colnames(x)) {
+      xfoundsu <- unique(x[[intermediate_source]]);
       if (length(split) > 0 && nchar(split) > 0) {
          xfoundsuv <- jamba::cPasteU(strsplit(xfoundsu, split),
             sep=sep);
       } else {
          xfoundsuv <- xfoundsu;
       }
-      x[["found_source"]] <- xfoundsuv[match(x[["found_source"]], xfoundsu)];
+      x[[intermediate_source]] <- xfoundsuv[match(x[[intermediate_source]], xfoundsu)];
+   }
+   if (verbose) {
+      jamba::printDebug("freshenGenes(): ",
+         "head(x, 10):");
+      print(head(x, 10));
    }
    
    ###################################
-   ## final
+   ## final arrangement of columns
+   ## 30mar2021: changed to stop using "found"
+   ## which required renaming to "intermediate"
+   ## and use intermediate directly
    if (length(final) > 0) {
-      xnames <- colnames(x);
-      xnames <- jamba::makeNames(
-         gsub("^found", 
-            "intermediate",
-            xnames),
-         renameFirst=FALSE);
-      colnames(x) <- xnames;
-      ## LOC# recovery
-      isempty <- (nchar(jamba::rmNA(naValue="", x[["intermediate"]])) == 0);
-      if (any(isempty)) {
-         isloc <- grepl("^LOC[0-9]+$", x[[1]][isempty]);
+      #xnames <- colnames(x);
+      #xnames <- jamba::makeNames(
+      #   gsub("^found", 
+      #      "intermediate",
+      #      xnames),
+      #   renameFirst=FALSE);
+      #colnames(x) <- xnames;
+      
+      ## LOC# recovery for entries that have no intermediate
+      # 30mar2021 this change in isempty should be slightly faster
+      #isempty <- (nchar(jamba::rmNA(naValue="", x[[intermediate]])) == 0);
+      #isempty <- (is.na(x[[intermediate]]) | nchar(x[[intermediate]]) == 0);
+      isempty <- genejam::is_empty(x[[intermediate]]);
+      if (any(isempty) && length(xnames) > 0) {
+         xnames1 <- head(xnames, 1);
+         isloc <- grepl("^LOC[0-9]+$", x[[xnames1]][isempty]);
          if (any(isloc)) {
-            x[["intermediate"]][isempty][isloc] <- gsub("^LOC", "", x[[1]][isempty][isloc]);
+            if (verbose) {
+               jamba::printDebug("freshenGenes(): ",
+                  "Converting ",
+                  jamba::formatInt(sum(isloc)),
+                  " entries with format ",
+                  "'LOC1234567'",
+                  " and no intermediate, to: ",
+                  "'1234567'", " format.");
+            }
+            # replace "LOC211052" with "211052"
+            x[[intermediate]][isempty][isloc] <- gsub("^LOC",
+               "",
+               x[[xnames1]][isempty][isloc]);
          }
+      }
+      if (verbose) {
+         jamba::printDebug("freshenGenes(): ",
+            "Processing final data.frame, head(x, 10):");
+         print(head(x, 10));
       }
       for (i in final) {
          if (verbose) {
-            jamba::printDebug("final i:", i);
+            jamba::printDebug("freshenGenes(): ",
+               "Processing final:", i);
          }
-         x1 <- freshenGenes(x[["intermediate"]],
+         # note intermediate=i and final=NULL
+         # means the return data will have colname i
+         x1 <- freshenGenes(x[[intermediate]],
             sep=sep,
             split=sep,
             handle_multiple=handle_multiple,
             ann_lib=ann_lib,
             try_list=i,
             final=NULL,
+            include_source=FALSE,
+            intermediate=i,
+            verbose=verbose > 1,
             ...);
-         x[[i]] <- x1[["found"]];
-         if (include_source) {
-            x[[paste0(i, "_source")]] <- x1[["found_source"]];
-         }
+         x[[i]] <- x1[[i]];
+         # This step should not be necessary for "final"
+         #if (include_source) {
+         #   i_source <- paste0(i, "_source");
+         #   x[[i_source]] <- x1[[i_source]];
+         #}
       }
       if ("original" %in% empty_rule) {
          ifinal <- head(final, 1);
-         isempty <- (nchar(jamba::rmNA(naValue="", x[[ifinal]])) == 0);
+         # 30mar2021 this change in isempty should be slightly faster
+         #isempty <- (nchar(jamba::rmNA(naValue="", x[[ifinal]])) == 0);
+         #isempty <- (is.na(x[[intermediate]]) | nchar(x[[intermediate]]) == 0);
+         isempty <- genejam::is_empty(x[[intermediate]]);
          x[[ifinal]][isempty] <- x[[1]][isempty];
       } else if ("na" %in% empty_rule) {
          ifinal <- head(final, 1);
-         isempty <- (nchar(jamba::rmNA(naValue="", x[[ifinal]])) == 0);
+         # 30mar2021 this change in isempty should be slightly faster
+         #isempty <- (nchar(jamba::rmNA(naValue="", x[[ifinal]])) == 0);
+         #isempty <- (is.na(x[[intermediate]]) | nchar(x[[intermediate]]) == 0);
+         isempty <- genejam::is_empty(x[[intermediate]]);
          x[[ifinal]][isempty] <- NA;
       }
    }

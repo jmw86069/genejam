@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -53,7 +57,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-news">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -67,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">genejam</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.13.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.14.900</span>
       </span>
     </div>
 
@@ -88,7 +92,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/jmw86069/genejam">
+  <a href="http://github.com/jmw86069/genejam/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -106,16 +110,41 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Changelog <small></small></h1>
-      <small>Source: <a href='https://github.com/jmw86069/genejam/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+      <h1 data-toc-skip>Changelog <small></small></h1>
+      <small>Source: <a href='http://github.com/jmw86069/genejam/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="version-0013900" class="section level1">
-<h1 class="page-header">
-<a href="#version-0013900" class="anchor"></a>Version 0.0.13.900</h1>
+    <div id="version-0014900" class="section level1">
+<h1 class="page-header" data-toc-text="0.0.14.900">
+<a href="#version-0014900" class="anchor"></a>Version 0.0.14.900</h1>
+<div id="updates-to-existing-functions" class="section level2">
+<h2 class="hasAnchor">
+<a href="#updates-to-existing-functions" class="anchor"></a>updates to existing functions</h2>
+<ul>
+<li>
+<p><code><a href="../reference/freshenGenes.html">freshenGenes()</a></code> was updated so the input can contain intermediate values, for example ENTREZID values. In fact, now input can contain a mixture of gene symbols, ENTREZID intermediate values, and it will fill in the holes accordingly.</p>
+<ul>
+<li>new argument <code>intermediate</code> to define the colname that contains the intermediate values, most commonly EG which are Entrez gene ID.</li>
+<li>Values are propagated in <code>intermediate</code> except when <code>handle_multiple="first_hit"</code> any existing value in <code>intermediate</code> is used with no further processing. All other <code>handle_multiple</code> will combine entries into <code>intermediate</code>.</li>
+</ul>
+</li>
+</ul>
+</div>
 <div id="new-functions" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-functions" class="anchor"></a>new functions</h2>
+<ul>
+<li>
+<code><a href="../reference/is_empty.html">is_empty()</a></code> is a small helper function to determine which entries in a vector are either <code>NA</code> or <code>""</code>.</li>
+</ul>
+</div>
+</div>
+    <div id="version-0013900" class="section level1">
+<h1 class="page-header" data-toc-text="0.0.13.900">
+<a href="#version-0013900" class="anchor"></a>Version 0.0.13.900</h1>
+<div id="new-functions-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-functions-1" class="anchor"></a>new functions</h2>
 <p>These two new functions are convenience functions. I often find myself wanting the gene symbol and long gene name, so now <code><a href="../reference/freshenGenes2.html">freshenGenes2()</a></code> does that by default. To add gene aliases, use <code><a href="../reference/freshenGenes3.html">freshenGenes3()</a></code>.</p>
 <ul>
 <li>
@@ -126,7 +155,7 @@
 </div>
 </div>
     <div id="version-0012900" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.0.12.900">
 <a href="#version-0012900" class="anchor"></a>Version 0.0.12.900</h1>
 <div id="changes-to-existing-functions" class="section level2">
 <h2 class="hasAnchor">
@@ -138,7 +167,7 @@
 </div>
 </div>
     <div id="version-0011900" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.0.11.900">
 <a href="#version-0011900" class="anchor"></a>Version 0.0.11.900</h1>
 <div id="changes-to-existing-functions-1" class="section level2">
 <h2 class="hasAnchor">
@@ -179,11 +208,11 @@
 </div>
 </div>
     <div id="version-0010900" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.0.10.900">
 <a href="#version-0010900" class="anchor"></a>Version 0.0.10.900</h1>
-<div id="new-functions-1" class="section level2">
+<div id="new-functions-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-functions-1" class="anchor"></a>New functions</h2>
+<a href="#new-functions-2" class="anchor"></a>New functions</h2>
 <ul>
 <li>
 <code><a href="../reference/better_exists.html">better_exists()</a></code> and <code><a href="../reference/better_get.html">better_get()</a></code> which are (not so humbly) improved versions of <code><a href="https://rdrr.io/r/base/exists.html">base::exists()</a></code> and <code><a href="https://rdrr.io/r/base/get.html">base::get()</a></code> respectively. Their sole benefit is to recognize a package prefix in an object name, so things like <code><a href="../reference/better_exists.html">better_exists("base::get")</a></code> will return TRUE since that object does exist; and subsequently <code><a href="../reference/better_get.html">better_get("base::get")</a></code> will return that object. These functions are mostly useful when using annotation package prefixes such as <code>"KEGG.db::KEGGPATHID2NAME"</code>. I needed a simple way to test if it exists. <code><a href="../reference/better_exists.html">better_exists()</a></code> also allows multiple input values.</li>
@@ -201,7 +230,7 @@
 </div>
 </div>
     <div id="version-009900" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.0.9.900">
 <a href="#version-009900" class="anchor"></a>Version 0.0.9.900</h1>
 <div id="changes-to-existing-functions-4" class="section level2">
 <h2 class="hasAnchor">
@@ -213,12 +242,12 @@
 </div>
 </div>
     <div id="version-008900" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.0.8.900">
 <a href="#version-008900" class="anchor"></a>Version 0.0.8.900</h1>
 <p>The next version will have <code>handle_multiple="best_each"</code> which will find the best match for each entry in a set of delimited gene symbols. Most useful for something like pathway enrichment results, where the goal is to retain all possible genes, yet each gene may require a different type of annotation to find a match. See <code>TODO.md</code> for details.</p>
-<div id="updates-to-existing-functions" class="section level2">
+<div id="updates-to-existing-functions-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#updates-to-existing-functions" class="anchor"></a>Updates to existing functions</h2>
+<a href="#updates-to-existing-functions-1" class="anchor"></a>Updates to existing functions</h2>
 <ul>
 <li>
 <code><a href="../reference/freshenGenes.html">freshenGenes()</a></code> includes a new example showing how to recognize Affymetrix probesets by using a custom search library.</li>
@@ -232,11 +261,11 @@
 </div>
 </div>
     <div id="version-007900" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.0.7.900">
 <a href="#version-007900" class="anchor"></a>Version 0.0.7.900</h1>
-<div id="updates-to-existing-functions-1" class="section level2">
+<div id="updates-to-existing-functions-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#updates-to-existing-functions-1" class="anchor"></a>Updates to existing functions</h2>
+<a href="#updates-to-existing-functions-2" class="anchor"></a>Updates to existing functions</h2>
 <ul>
 <li>
 <code><a href="../reference/freshenGenes.html">freshenGenes()</a></code> now properly ignores NA values without throwing an exception. NA values are left as-is and returned as NA in the final output.</li>
@@ -244,19 +273,19 @@
 </div>
 </div>
     <div id="version-006900" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.0.6.900">
 <a href="#version-006900" class="anchor"></a>Version 0.0.6.900</h1>
-<div id="updates-to-existing-functions-2" class="section level2">
+<div id="updates-to-existing-functions-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#updates-to-existing-functions-2" class="anchor"></a>Updates to existing functions</h2>
+<a href="#updates-to-existing-functions-3" class="anchor"></a>Updates to existing functions</h2>
 <ul>
 <li>
 <code><a href="../reference/freshenGenes.html">freshenGenes()</a></code> new argument <code>protect_inline_sep</code> helps to prevent splitting single values that may include the same sep character, for example not splitting <code>"H4 clustered histone 10, pseudogene"</code> into <code>"H4 clustered histone 10"</code> and "<code>pseudogene"</code>. Also, the handling of <code>finalList</code> uses <code>sep</code> as the <code>split</code> since that <code>sep</code> is known to have been used in creating the intermediate values, therefore it should be consistent in the final step. This subtle change helps allow a more general split pattern in the first step, such as <code>"[, ]+"</code> which splits at comma and/or space, without splitting at spaces in subsequent steps.</li>
 </ul>
 </div>
-<div id="new-functions-2" class="section level2">
+<div id="new-functions-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-functions-2" class="anchor"></a>New functions</h2>
+<a href="#new-functions-3" class="anchor"></a>New functions</h2>
 <ul>
 <li>
 <code><a href="../reference/lgsub.html">lgsub()</a></code> is a simple wrapper around <code><a href="https://rdrr.io/r/base/grep.html">gsub()</a></code> except that it operates on character vectors inside a <code>list</code>. This function will probably be moved into the <code>jamba</code> package in the near future. In fact, there will probably be a small family of list-friendly functions: lgrep(), lvigrep(), lvgrep(), lstrsplit().</li>
@@ -264,11 +293,11 @@
 </div>
 </div>
     <div id="version-005900" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.0.5.900">
 <a href="#version-005900" class="anchor"></a>Version 0.0.5.900</h1>
-<div id="updates-to-existing-functions-3" class="section level2">
+<div id="updates-to-existing-functions-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#updates-to-existing-functions-3" class="anchor"></a>Updates to existing functions</h2>
+<a href="#updates-to-existing-functions-4" class="anchor"></a>Updates to existing functions</h2>
 <ul>
 <li>
 <code><a href="../reference/get_anno_db.html">get_anno_db()</a></code> was updated to handle reverse-map annotations, for example requesting <code>org.Hs.egALIAS</code> and deriving it from <code>org.Hs.egALIAS2EG</code> using <code><a href="https://rdrr.io/pkg/AnnotationDbi/man/Bimap-direction.html">AnnotationDbi::revmap()</a></code>.</li>
@@ -276,29 +305,29 @@
 </div>
 </div>
     <div id="version-004900" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.0.4.900">
 <a href="#version-004900" class="anchor"></a>Version 0.0.4.900</h1>
-<div id="updates-to-existing-functions-4" class="section level2">
+<div id="updates-to-existing-functions-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#updates-to-existing-functions-4" class="anchor"></a>Updates to existing functions</h2>
+<a href="#updates-to-existing-functions-5" class="anchor"></a>Updates to existing functions</h2>
 <ul>
 <li>Another update to resolve cascade <code>stringsAsFactors</code> bugs. Least favorite default option in R.</li>
 </ul>
 </div>
 </div>
     <div id="version-003900" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.0.3.900">
 <a href="#version-003900" class="anchor"></a>Version 0.0.3.900</h1>
-<div id="updates-to-existing-functions-5" class="section level2">
+<div id="updates-to-existing-functions-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#updates-to-existing-functions-5" class="anchor"></a>Updates to existing functions</h2>
+<a href="#updates-to-existing-functions-6" class="anchor"></a>Updates to existing functions</h2>
 <ul>
 <li>Force input <code>x</code> to character in <code><a href="../reference/freshenGenes.html">freshenGenes()</a></code>.</li>
 </ul>
 </div>
 </div>
     <div id="version-002900" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.0.2.900">
 <a href="#version-002900" class="anchor"></a>Version 0.0.2.900</h1>
 <p>Note that genejam requires one Bioconductor annotation package, usually <code>org.Hs.eg.db</code> but can be any valid organism, such as <code>org.Mm.eg.db</code> for mouse, or <code>org.Rn.eg.db</code> for rat.</p>
 <div id="bug-fixes" class="section level2">
@@ -311,24 +340,10 @@
 </div>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <div id="tocnav">
-      <h2>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-        <li><a href="#version-0013900">0.0.13.900</a></li>
-        <li><a href="#version-0012900">0.0.12.900</a></li>
-        <li><a href="#version-0011900">0.0.11.900</a></li>
-        <li><a href="#version-0010900">0.0.10.900</a></li>
-        <li><a href="#version-009900">0.0.9.900</a></li>
-        <li><a href="#version-008900">0.0.8.900</a></li>
-        <li><a href="#version-007900">0.0.7.900</a></li>
-        <li><a href="#version-006900">0.0.6.900</a></li>
-        <li><a href="#version-005900">0.0.5.900</a></li>
-        <li><a href="#version-004900">0.0.4.900</a></li>
-        <li><a href="#version-003900">0.0.3.900</a></li>
-        <li><a href="#version-002900">0.0.2.900</a></li>
-      </ul>
-    </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 
 </div>
@@ -340,7 +355,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

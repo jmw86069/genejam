@@ -50,6 +50,7 @@ reverse mapped annotation object is returned.
 Other genejam: 
 \code{\link{freshenGenes2}()},
 \code{\link{freshenGenes3}()},
-\code{\link{freshenGenes}()}
+\code{\link{freshenGenes}()},
+\code{\link{is_empty}()}
 }
 \concept{genejam}

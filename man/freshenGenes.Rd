@@ -15,6 +15,7 @@ freshenGenes(
   empty_rule = c("empty", "original", "na"),
   include_source = FALSE,
   protect_inline_sep = TRUE,
+  intermediate = "intermediate",
   verbose = FALSE,
   ...
 )
@@ -87,6 +88,13 @@ not separate multiple separate values, so they should not be
 used to split a string like \code{"H4 clustered histone 10, pseudogene"}
 into two strings \code{"H4 clustered histone 10"} and \code{"pseudogene"}.}
 
+\item{intermediate}{\code{character} string with colname in \code{x} that
+contains intermediate values. These values are expected from output
+of the first step in the workflow, for example \code{"SYMBOL2EG"}
+returns Entrez gene values, so if the input \code{x} already contains
+some of these values in a column, assign that colname to
+\code{intermediate}.}
+
 \item{verbose}{logical indicating whether to print verbose output.}
 }
 \value{
@@ -138,6 +146,9 @@ each of which will be returned. Some common examples:
 
 For each step, the annotation matched can be returned, as an audit
 trail to see which annotation was available for each input entry.
+
+Note that if the input data already contains Entrez gene ID
+values, you can define that colname with argument \code{intermediate}.
 }
 }
 \examples{
@@ -181,6 +192,7 @@ if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
 Other genejam: 
 \code{\link{freshenGenes2}()},
 \code{\link{freshenGenes3}()},
-\code{\link{get_anno_db}()}
+\code{\link{get_anno_db}()},
+\code{\link{is_empty}()}
 }
 \concept{genejam}

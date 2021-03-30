@@ -15,6 +15,7 @@ freshenGenes2(
   empty_rule = c("empty", "original", "na"),
   include_source = FALSE,
   protect_inline_sep = TRUE,
+  intermediate = "intermediate",
   verbose = FALSE,
   ...
 )
@@ -87,6 +88,13 @@ not separate multiple separate values, so they should not be
 used to split a string like \code{"H4 clustered histone 10, pseudogene"}
 into two strings \code{"H4 clustered histone 10"} and \code{"pseudogene"}.}
 
+\item{intermediate}{\code{character} string with colname in \code{x} that
+contains intermediate values. These values are expected from output
+of the first step in the workflow, for example \code{"SYMBOL2EG"}
+returns Entrez gene values, so if the input \code{x} already contains
+some of these values in a column, assign that colname to
+\code{intermediate}.}
+
 \item{verbose}{logical indicating whether to print verbose output.}
 }
 \description{
@@ -103,6 +111,7 @@ the gene symbol, and the long gene name.
 Other genejam: 
 \code{\link{freshenGenes3}()},
 \code{\link{freshenGenes}()},
-\code{\link{get_anno_db}()}
+\code{\link{get_anno_db}()},
+\code{\link{is_empty}()}
 }
 \concept{genejam}

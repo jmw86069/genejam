@@ -1,3 +1,28 @@
+# Version 0.0.14.900
+
+## updates to existing functions
+
+* `freshenGenes()` was updated so the input can contain
+intermediate values, for example ENTREZID values.
+In fact, now input can contain a mixture of gene symbols,
+ENTREZID intermediate values, and it will fill in the
+holes accordingly.
+
+   * new argument `intermediate` to define the colname that
+   contains the intermediate values, most commonly EG which
+   are Entrez gene ID.
+   * Values are propagated in `intermediate` except when
+   `handle_multiple="first_hit"` any existing value in
+   `intermediate` is used with no further processing.
+   All other `handle_multiple` will combine entries
+   into `intermediate`.
+
+## new functions
+
+* `is_empty()` is a small helper function to determine which
+entries in a vector are either `NA` or `""`.
+
+
 # Version 0.0.13.900
 
 ## new functions

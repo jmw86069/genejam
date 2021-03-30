@@ -1,8 +1,13 @@
 Package: genejam
 Title: Gene Jam
-Version: 0.0.13.900
-Authors@R: person(given="James M.", family="Ward",
-   email="jmw86069@gmail.com", role=c("aut", "cre"))
+Version: 0.0.14.900
+Authors@R: c(
+    person(given="James M.",
+       family="Ward",
+       email="jmw86069@gmail.com",
+       comment=c(ORCID="0000-0002-9510-2848"),
+       role=c("aut", "cre"))
+   )
 Description: Gene annotation utility functions.
 biocViews:
 Depends: R (>= 3.6.0)

@@ -25,6 +25,7 @@ freshenGenes2 <- function
  empty_rule=c("empty", "original", "na"),
  include_source=FALSE,
  protect_inline_sep=TRUE,
+ intermediate="intermediate",
  verbose=FALSE,
  ...)
 {
@@ -38,6 +39,7 @@ freshenGenes2 <- function
       empty_rule=empty_rule,
       include_source=include_source,
       protect_inline_sep=protect_inline_sep,
+      intermediate=intermediate,
       verbose=verbose,
       ...);
 }
@@ -71,6 +73,7 @@ freshenGenes3 <- function
  empty_rule=c("empty", "original", "na"),
  include_source=FALSE,
  protect_inline_sep=TRUE,
+ intermediate="intermediate",
  verbose=FALSE,
  ...)
 {
@@ -84,6 +87,50 @@ freshenGenes3 <- function
       empty_rule=empty_rule,
       include_source=include_source,
       protect_inline_sep=protect_inline_sep,
+      intermediate=intermediate,
       verbose=verbose,
       ...);
+}
+
+
+#' Test if vector elements are empty
+#' 
+#' Test if vector elements are empty
+#' 
+#' This function simply checks if values in a vector are
+#' `NA` or `""` with `nchar(x) == 0`.
+#' 
+#' For `factor` input, the values are coerced with `as.character()`.
+#' It might be slightly faster to test factor levels then to
+#' apply to the full vector.
+#' 
+#' Todo: Make this function work with `list` input, so it
+#' requires all elements to be `is_empty()`.
+#' 
+#' @family genejam
+#' 
+#' @param x `vector` that may contain `NA` values.
+#' @param ... additional arguments are ignored.
+#' 
+#' @examples
+#' x1 <- c("A", "", NA, "B,C");
+#' is_empty(x1)
+#' 
+#' is_empty(factor(x1))
+#' 
+#' @export
+is_empty <- function
+(x,
+ ...)
+{
+   if (!is.atomic(x)) {
+      stop("Input must be atomic vector.")
+   }
+   if (is.factor(x)) {
+      (is.na(x) | nchar(as.character(x)) == 0)
+   } else if (is.numeric(x)) {
+      is.na(x)
+   } else {
+      (is.na(x) | nchar(x) == 0)
+   }
 }
