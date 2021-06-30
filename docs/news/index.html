@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">genejam</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.14.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.15.900</span>
       </span>
     </div>
 
@@ -114,12 +114,24 @@
       <small>Source: <a href='http://github.com/jmw86069/genejam/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="version-0014900" class="section level1">
-<h1 class="page-header" data-toc-text="0.0.14.900">
-<a href="#version-0014900" class="anchor"></a>Version 0.0.14.900</h1>
+    <div id="version-0015900" class="section level1">
+<h1 class="page-header" data-toc-text="0.0.15.900">
+<a href="#version-0015900" class="anchor"></a>Version 0.0.15.900</h1>
 <div id="updates-to-existing-functions" class="section level2">
 <h2 class="hasAnchor">
 <a href="#updates-to-existing-functions" class="anchor"></a>updates to existing functions</h2>
+<ul>
+<li>
+<code><a href="../reference/freshenGenes.html">freshenGenes()</a></code> new argument <code>ignore.case</code> which calls <code><a href="../reference/imget.html">genejam::imget()</a></code> as a drop-in replacement for <code><a href="https://rdrr.io/r/base/get.html">mget()</a></code>. The process was improved by calling <code><a href="https://rdrr.io/pkg/AnnotationDbi/man/AnnotationDb-class.html">AnnotationDbi::keys()</a></code> instead of <code><a href="https://rdrr.io/pkg/AnnotationDbi/man/Bimap-envirAPI.html">AnnotationDbi::ls()</a></code>, and this change is at least an order of magnitude faster. In brief benchmarks, using <code>ignore.case=TRUE</code> adds roughly 0.1 seconds per annotation in <code>try_list</code>, but otherwise is the same speed regardless the number of input entries.</li>
+</ul>
+</div>
+</div>
+    <div id="version-0014900" class="section level1">
+<h1 class="page-header" data-toc-text="0.0.14.900">
+<a href="#version-0014900" class="anchor"></a>Version 0.0.14.900</h1>
+<div id="updates-to-existing-functions-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#updates-to-existing-functions-1" class="anchor"></a>updates to existing functions</h2>
 <ul>
 <li>
 <p><code><a href="../reference/freshenGenes.html">freshenGenes()</a></code> was updated so the input can contain intermediate values, for example ENTREZID values. In fact, now input can contain a mixture of gene symbols, ENTREZID intermediate values, and it will fill in the holes accordingly.</p>
@@ -245,9 +257,9 @@
 <h1 class="page-header" data-toc-text="0.0.8.900">
 <a href="#version-008900" class="anchor"></a>Version 0.0.8.900</h1>
 <p>The next version will have <code>handle_multiple="best_each"</code> which will find the best match for each entry in a set of delimited gene symbols. Most useful for something like pathway enrichment results, where the goal is to retain all possible genes, yet each gene may require a different type of annotation to find a match. See <code>TODO.md</code> for details.</p>
-<div id="updates-to-existing-functions-1" class="section level2">
+<div id="updates-to-existing-functions-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#updates-to-existing-functions-1" class="anchor"></a>Updates to existing functions</h2>
+<a href="#updates-to-existing-functions-2" class="anchor"></a>Updates to existing functions</h2>
 <ul>
 <li>
 <code><a href="../reference/freshenGenes.html">freshenGenes()</a></code> includes a new example showing how to recognize Affymetrix probesets by using a custom search library.</li>
@@ -263,9 +275,9 @@
     <div id="version-007900" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.7.900">
 <a href="#version-007900" class="anchor"></a>Version 0.0.7.900</h1>
-<div id="updates-to-existing-functions-2" class="section level2">
+<div id="updates-to-existing-functions-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#updates-to-existing-functions-2" class="anchor"></a>Updates to existing functions</h2>
+<a href="#updates-to-existing-functions-3" class="anchor"></a>Updates to existing functions</h2>
 <ul>
 <li>
 <code><a href="../reference/freshenGenes.html">freshenGenes()</a></code> now properly ignores NA values without throwing an exception. NA values are left as-is and returned as NA in the final output.</li>
@@ -275,9 +287,9 @@
     <div id="version-006900" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.6.900">
 <a href="#version-006900" class="anchor"></a>Version 0.0.6.900</h1>
-<div id="updates-to-existing-functions-3" class="section level2">
+<div id="updates-to-existing-functions-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#updates-to-existing-functions-3" class="anchor"></a>Updates to existing functions</h2>
+<a href="#updates-to-existing-functions-4" class="anchor"></a>Updates to existing functions</h2>
 <ul>
 <li>
 <code><a href="../reference/freshenGenes.html">freshenGenes()</a></code> new argument <code>protect_inline_sep</code> helps to prevent splitting single values that may include the same sep character, for example not splitting <code>"H4 clustered histone 10, pseudogene"</code> into <code>"H4 clustered histone 10"</code> and "<code>pseudogene"</code>. Also, the handling of <code>finalList</code> uses <code>sep</code> as the <code>split</code> since that <code>sep</code> is known to have been used in creating the intermediate values, therefore it should be consistent in the final step. This subtle change helps allow a more general split pattern in the first step, such as <code>"[, ]+"</code> which splits at comma and/or space, without splitting at spaces in subsequent steps.</li>
@@ -295,9 +307,9 @@
     <div id="version-005900" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.5.900">
 <a href="#version-005900" class="anchor"></a>Version 0.0.5.900</h1>
-<div id="updates-to-existing-functions-4" class="section level2">
+<div id="updates-to-existing-functions-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#updates-to-existing-functions-4" class="anchor"></a>Updates to existing functions</h2>
+<a href="#updates-to-existing-functions-5" class="anchor"></a>Updates to existing functions</h2>
 <ul>
 <li>
 <code><a href="../reference/get_anno_db.html">get_anno_db()</a></code> was updated to handle reverse-map annotations, for example requesting <code>org.Hs.egALIAS</code> and deriving it from <code>org.Hs.egALIAS2EG</code> using <code><a href="https://rdrr.io/pkg/AnnotationDbi/man/Bimap-direction.html">AnnotationDbi::revmap()</a></code>.</li>
@@ -307,9 +319,9 @@
     <div id="version-004900" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.4.900">
 <a href="#version-004900" class="anchor"></a>Version 0.0.4.900</h1>
-<div id="updates-to-existing-functions-5" class="section level2">
+<div id="updates-to-existing-functions-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#updates-to-existing-functions-5" class="anchor"></a>Updates to existing functions</h2>
+<a href="#updates-to-existing-functions-6" class="anchor"></a>Updates to existing functions</h2>
 <ul>
 <li>Another update to resolve cascade <code>stringsAsFactors</code> bugs. Least favorite default option in R.</li>
 </ul>
@@ -318,9 +330,9 @@
     <div id="version-003900" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.3.900">
 <a href="#version-003900" class="anchor"></a>Version 0.0.3.900</h1>
-<div id="updates-to-existing-functions-6" class="section level2">
+<div id="updates-to-existing-functions-7" class="section level2">
 <h2 class="hasAnchor">
-<a href="#updates-to-existing-functions-6" class="anchor"></a>Updates to existing functions</h2>
+<a href="#updates-to-existing-functions-7" class="anchor"></a>Updates to existing functions</h2>
 <ul>
 <li>Force input <code>x</code> to character in <code><a href="../reference/freshenGenes.html">freshenGenes()</a></code>.</li>
 </ul>

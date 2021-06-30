@@ -1,7 +1,44 @@
 # TODO for genejam
 
 
-## Fix bug when colname "intermediate" is supplied as input
+## Refresh 30jun2021: Optional case-insensitive lookup
+
+Current workflow requires two un-intuitive steps:
+
+1. Prepare annotation library with `get_anno_db(.., ignore.case=TRUE)`.
+This step also requires the full annotation library input,
+no convenience of providing only `"SYMBOL2EG"` for example.
+Also, this step is fairly slow - about 17 seconds to prepare
+three annotation environments. If not cached, obviously this
+step adds 17 seconds to every response time.
+
+```R
+library(genejam)
+try_dbs <- list(org.Hs.egSYMBOL2EG=org.Hs.egSYMBOL2EG,
+   org.Hs.egACCNUM2EG=org.Hs.egACCNUM2EG,
+   org.Hs.egALIAS2EGorg.Hs.egALIAS2EG=org.Hs.egALIAS2EG)
+system.time(try_list <- lapply(try_dbs, function(i){
+   get_anno_db(i, ignore.case=TRUE)
+}))
+```
+
+2. Convert input to lowercase with `tolower()`, and query
+using the custom `try_list` object from step 1.
+
+The solution seems to be the custom function `genejam::imget()`
+with case-insensitive `mget()`, with prefix `i` to indicate
+case-insensitive.
+
+
+```R
+freshenGenes3(tolower(c("TRKB", "ApoE")), try_list=try_list)
+```
+
+
+
+## COMPLETE: Fix bug when colname "intermediate" is supplied as input
+
+
 
 ### Reproducible example (0.0.13.900 or less)
 

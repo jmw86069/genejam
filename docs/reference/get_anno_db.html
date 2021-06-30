@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">genejam</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.14.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.15.900</span>
       </span>
     </div>
 
@@ -146,10 +146,11 @@ the annotation is reverse-mapped using <code><a href='https://rdrr.io/pkg/Annota
     </tr>
     <tr>
       <th>ignore.case</th>
-      <td><p>logical indicating whether to return an environment
+      <td><p><code>logical</code> indicating whether to return an environment
 after converting all keys to lowercase, which is one implementation
-choice to provide case-insensitive output from <code><a href='https://rdrr.io/r/base/get.html'>mget()</a></code>. In order
-to fulfill the potential, the subsequent <code><a href='https://rdrr.io/r/base/get.html'>mget()</a></code> must also
+choice to provide case-insensitive output while using standard
+<code><a href='https://rdrr.io/r/base/get.html'>mget()</a></code>. This option may not be ideal, see description for defailts.
+In order to fulfill the potential, the subsequent <code><a href='https://rdrr.io/r/base/get.html'>mget()</a></code> must also
 use <code><a href='https://rdrr.io/r/base/chartr.html'>tolower(x)</a></code> on the input character vector. Note that this
 option is currently fairly slow, and uses more memory while the
 environment is loaded.</p></td>
@@ -172,6 +173,19 @@ or an annotation object, and returns the annotation object.</p>
 <p>In the event the annotation object must be derived using
 <code><a href='https://rdrr.io/pkg/AnnotationDbi/man/Bimap-direction.html'>AnnotationDbi::revmap()</a></code>, then that process is performed, and the
 reverse mapped annotation object is returned.</p>
+<p>When invoking with argument <code>ignore.case=TRUE</code>, this function
+returns keys that have been converted to lowercase. The process
+can be fairly slow (~5 seconds per human genome annotation),
+but results in an annotation that can be used directly and
+may be faster for repeated use than calling <code><a href='imget.html'>imget()</a></code>.</p>
+<p>The alternative to <code>ignore.case=TRUE</code> is to call <code><a href='imget.html'>imget()</a></code> for
+direct query of an annotation, or call <code><a href='freshenGenes.html'>freshenGenes(..., ignore.case=TRUE)</a></code>
+which will call <code><a href='imget.html'>imget()</a></code> internally.
+In our benchmark tests, using <code><a href='imget.html'>imget()</a></code> appears to add roughly
+0.1 seconds per query, regardless of the number of input entries.
+This appears to be the time it takes to spool the list of annotation
+keys stored in the SQLite database, and may therefore be dependent upon
+the size of the annotation file.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other genejam: 

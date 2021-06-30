@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">genejam</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.14.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.15.900</span>
       </span>
     </div>
 
@@ -115,9 +115,31 @@
 
 <div id="todo-for-genejam" class="section level1">
 
-<div id="fix-bug-when-colname-intermediate-is-supplied-as-input" class="section level2">
+<div id="refresh-30jun2021-optional-case-insensitive-lookup" class="section level2">
 <h2 class="hasAnchor">
-<a href="#fix-bug-when-colname-intermediate-is-supplied-as-input" class="anchor"></a>Fix bug when colname “intermediate” is supplied as input</h2>
+<a href="#refresh-30jun2021-optional-case-insensitive-lookup" class="anchor"></a>Refresh 30jun2021: Optional case-insensitive lookup</h2>
+<p>Current workflow requires two un-intuitive steps:</p>
+<ol>
+<li>Prepare annotation library with <code><a href="reference/get_anno_db.html">get_anno_db(.., ignore.case=TRUE)</a></code>. This step also requires the full annotation library input, no convenience of providing only <code>"SYMBOL2EG"</code> for example. Also, this step is fairly slow - about 17 seconds to prepare three annotation environments. If not cached, obviously this step adds 17 seconds to every response time.</li>
+</ol>
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://github.com/jmw86069/genejam">genejam</a></span><span class="op">)</span>
+<span class="va">try_dbs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>org.Hs.egSYMBOL2EG<span class="op">=</span><span class="va">org.Hs.egSYMBOL2EG</span>,
+   org.Hs.egACCNUM2EG<span class="op">=</span><span class="va">org.Hs.egACCNUM2EG</span>,
+   org.Hs.egALIAS2EGorg.Hs.egALIAS2EG<span class="op">=</span><span class="va">org.Hs.egALIAS2EG</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="va">try_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span><span class="va">try_dbs</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span><span class="op">{</span>
+   <span class="fu"><a href="reference/get_anno_db.html">get_anno_db</a></span><span class="op">(</span><span class="va">i</span>, ignore.case<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
+<span class="op">}</span><span class="op">)</span><span class="op">)</span></pre></div>
+<ol>
+<li>Convert input to lowercase with <code><a href="https://rdrr.io/r/base/chartr.html">tolower()</a></code>, and query using the custom <code>try_list</code> object from step 1.</li>
+</ol>
+<p>The solution seems to be the custom function <code><a href="reference/imget.html">genejam::imget()</a></code> with case-insensitive <code><a href="https://rdrr.io/r/base/get.html">mget()</a></code>, with prefix <code>i</code> to indicate case-insensitive.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="fu"><a href="reference/freshenGenes3.html">freshenGenes3</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chartr.html">tolower</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"TRKB"</span>, <span class="st">"ApoE"</span><span class="op">)</span><span class="op">)</span>, try_list<span class="op">=</span><span class="va">try_list</span><span class="op">)</span></pre></div>
+</div>
+<div id="complete-fix-bug-when-colname-intermediate-is-supplied-as-input" class="section level2">
+<h2 class="hasAnchor">
+<a href="#complete-fix-bug-when-colname-intermediate-is-supplied-as-input" class="anchor"></a>COMPLETE: Fix bug when colname “intermediate” is supplied as input</h2>
 <div id="reproducible-example-0013900-or-less" class="section level3">
 <h3 class="hasAnchor">
 <a href="#reproducible-example-0013900-or-less" class="anchor"></a>Reproducible example (0.0.13.900 or less)</h3>

@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">genejam</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.14.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.15.900</span>
       </span>
     </div>
 
@@ -132,6 +132,7 @@
   include_source <span class='op'>=</span> <span class='cn'>FALSE</span>,
   protect_inline_sep <span class='op'>=</span> <span class='cn'>TRUE</span>,
   intermediate <span class='op'>=</span> <span class='st'>"intermediate"</span>,
+  ignore.case <span class='op'>=</span> <span class='cn'>FALSE</span>,
   verbose <span class='op'>=</span> <span class='cn'>FALSE</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
@@ -236,6 +237,15 @@ some of these values in a column, assign that colname to
 <code>intermediate</code>.</p></td>
     </tr>
     <tr>
+      <th>ignore.case</th>
+      <td><p><code>logical</code> indicating whether to use
+case-insensitive matching when <code>ignore.case=TRUE</code>, otherwise
+the default <code>ignore.case=FALSE</code> will perform default <code><a href='https://rdrr.io/r/base/get.html'>mget()</a></code>
+which requires the upper and lowercase characters are
+an identical match. When <code>ignore.case=TRUE</code> this function
+calls <code><a href='imget.html'>genejam::imget()</a></code>.</p></td>
+    </tr>
+    <tr>
       <th>verbose</th>
       <td><p>logical indicating whether to print verbose output.</p></td>
     </tr>
@@ -286,6 +296,17 @@ each of which will be returned. Some common examples:</p><ul>
 trail to see which annotation was available for each input entry.</p>
 <p>Note that if the input data already contains Entrez gene ID
 values, you can define that colname with argument <code>intermediate</code>.</p>
+
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Case-insensitive search</h3>
+
+
+<p>For case-insensitive search, which is particularly useful in non-human
+organisms because they often use mixed-case, use the argument
+<code>ignore.case=TRUE</code>. In our benchmark tests it appears to add roughly
+0.1 seconds per annotation, regardless of the number of input entries.
+This appears to be the time it takes to spool the list of annotation
+keys stored in the SQLite database, and may therefore be dependent upon
+the size of the annotation file.</p>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 

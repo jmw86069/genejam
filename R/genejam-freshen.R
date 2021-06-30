@@ -44,6 +44,16 @@
 #' Note that if the input data already contains Entrez gene ID
 #' values, you can define that colname with argument `intermediate`.
 #' 
+#' ## Case-insensitive search
+#' 
+#' For case-insensitive search, which is particularly useful in non-human
+#' organisms because they often use mixed-case, use the argument
+#' `ignore.case=TRUE`. In our benchmark tests it appears to add roughly
+#' 0.1 seconds per annotation, regardless of the number of input entries.
+#' This appears to be the time it takes to spool the list of annotation
+#' keys stored in the SQLite database, and may therefore be dependent upon
+#' the size of the annotation file.
+#' 
 #' @return `data.frame` with one or more columns indicating the input
 #' data, then a column `"intermediate"` containing the Entrez gene ID
 #' that was matched, then one column for each item in `final`,
@@ -114,6 +124,12 @@
 #'    returns Entrez gene values, so if the input `x` already contains
 #'    some of these values in a column, assign that colname to
 #'    `intermediate`.
+#' @param ignore.case `logical` indicating whether to use
+#'    case-insensitive matching when `ignore.case=TRUE`, otherwise
+#'    the default `ignore.case=FALSE` will perform default `mget()`
+#'    which requires the upper and lowercase characters are
+#'    an identical match. When `ignore.case=TRUE` this function
+#'    calls `genejam::imget()`.
 #' @param verbose logical indicating whether to print verbose output.
 #' 
 #' @examples
@@ -165,6 +181,7 @@ freshenGenes <- function
  include_source=FALSE,
  protect_inline_sep=TRUE,
  intermediate="intermediate",
+ ignore.case=FALSE,
  verbose=FALSE,
  ...)
 {
@@ -239,17 +256,12 @@ freshenGenes <- function
             include_source=include_source,
             protect_inline_sep=protect_inline_sep,
             intermediate=intermediate,
+            ignore.case=ignore.case,
             verbose=FALSE);
          ## Split back into the original vector
          if (length(taller_factor) == 0) {
             return(taller_freshened);
          }
-         # 30mar2021: this chunk was ignored, commenting out
-         #final_colnames <- jamba::provigrep(c(final,
-         #   #"^intermediate",
-         #   intermediate,
-         #   "_source$"),
-         #   colnames(taller_freshened));
          final_colnames <- colnames(taller_freshened);
          x_new <- do.call(cbind, lapply(jamba::nameVector(final_colnames), function(i){
             taller_freshened_split <- split(taller_freshened[[i]],
@@ -296,20 +308,9 @@ freshenGenes <- function
       c(intermediate, intermediate_source));
 
    if (length(try_list) > 0) {
-      # 30mar2021: port from "found" to intermediate
-      #if (!"found" %in% colnames(x)) {
-      #   x[["found"]] <- rep("", nrow(x));
-      #}
       if (!intermediate %in% colnames(x)) {
          x[[intermediate]] <- rep("", nrow(x));
       }
-      # 30mar2021: port from "found_source" to intermediate_source
-      #if (!"found_source" %in% colnames(x)) {
-      #   x[["found_source"]] <- rep("", nrow(x));
-      #   if ("first_try" %in% handle_multiple) {
-      #      x[["found_try"]] <- rep(TRUE, nrow(x));
-      #   }
-      #}
       if (!intermediate_source %in% colnames(x)) {
          x[[intermediate_source]] <- rep("", nrow(x));
          if ("first_try" %in% handle_multiple) {
@@ -334,6 +335,7 @@ freshenGenes <- function
             }
             ienv <- get_anno_db(itryname,
                verbose=verbose,
+               ignore.case=FALSE,
                ...);
             itryname <- attr(ienv, "annoname");
          } else {
@@ -343,6 +345,7 @@ freshenGenes <- function
             }
             ienv <- get_anno_db(itry,
                verbose=verbose,
+               ignore.case=FALSE,
                ...);
             itryname <- attr(ienv, "annoname");
          }
@@ -360,15 +363,11 @@ freshenGenes <- function
                   "   iname:",
                   iname);
             }
-            #ifound <- x[["found"]];
-            #ifound_source <- x[["found_source"]];
             ifound <- x[[intermediate]];
             ifound_source <- x[[intermediate_source]];
             if ("first_hit" %in% handle_multiple) {
                ## input must have characters
                ## must have no found result
-               #ido <- (nchar(jamba::rmNA(naValue="", ifound)) == 0 &
-               #      nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
                ido <- (genejam::is_empty(ifound) &
                      !genejam::is_empty(x[[iname]]))
             } else if ("first_try" %in% handle_multiple) {
@@ -376,10 +375,8 @@ freshenGenes <- function
                ## previous try must have no result
                ido <- (x[["found_try"]] &
                      !genejam::is_empty(x[[iname]]));
-                     #nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
             } else {
                ## input must have characters, and not be empty
-               #ido <- (nchar(jamba::rmNA(naValue="", x[[iname]])) > 0);
                ido <- !genejam::is_empty(x[[iname]]);
             }
             ix <- x[[iname]][ido];
@@ -399,10 +396,19 @@ freshenGenes <- function
                   fgText=c("darkorange1", "aquamarine3"));
             }
             ixu <- jamba::rmNA(as.character(unique(ix)));
-            ivals_l <- AnnotationDbi::mget(ixu,
-               ienv,
-               ifnotfound=NA);
-
+            if (ignore.case) {
+               ivals_l <- imget(ixu,
+                  ienv,
+                  ifnotfound=NA);
+            } else {
+               ivals_l <- AnnotationDbi::mget(ixu,
+                  ienv,
+                  ifnotfound=NA);
+            }
+            if (verbose) {
+               jamba::printDebug("freshenGenes(): ",
+                  "      Complete.");
+            }
             ## Data cleaning step to protect values which have delimiters
             if (protect_inline_sep && jamba::igrepHas(sep, unlist(ivals_l))) {
                ## convert to dummy '!:!'
@@ -611,6 +617,21 @@ freshenGenes <- function
 #' `AnnotationDbi::revmap()`, then that process is performed, and the
 #' reverse mapped annotation object is returned.
 #' 
+#' When invoking with argument `ignore.case=TRUE`, this function
+#' returns keys that have been converted to lowercase. The process
+#' can be fairly slow (~5 seconds per human genome annotation),
+#' but results in an annotation that can be used directly and
+#' may be faster for repeated use than calling `imget()`.
+#' 
+#' The alternative to `ignore.case=TRUE` is to call `imget()` for
+#' direct query of an annotation, or call `freshenGenes(..., ignore.case=TRUE)`
+#' which will call `imget()` internally.
+#' In our benchmark tests, using `imget()` appears to add roughly
+#' 0.1 seconds per query, regardless of the number of input entries.
+#' This appears to be the time it takes to spool the list of annotation
+#' keys stored in the SQLite database, and may therefore be dependent upon
+#' the size of the annotation file.
+#' 
 #' @family genejam
 #' 
 #' @param x character name of an annotation object, or an annotation
@@ -620,10 +641,11 @@ freshenGenes <- function
 #'    example the suffix `"2EG"` is used to indicate that annotation
 #'    returns Entrez gene. When annotation does not contain this suffix,
 #'    the annotation is reverse-mapped using `AnnotationDbi::revmap()`.
-#' @param ignore.case logical indicating whether to return an environment
+#' @param ignore.case `logical` indicating whether to return an environment
 #'    after converting all keys to lowercase, which is one implementation
-#'    choice to provide case-insensitive output from `mget()`. In order
-#'    to fulfill the potential, the subsequent `mget()` must also
+#'    choice to provide case-insensitive output while using standard
+#'    `mget()`. This option may not be ideal, see description for defailts.
+#'    In order to fulfill the potential, the subsequent `mget()` must also
 #'    use `tolower(x)` on the input character vector. Note that this
 #'    option is currently fairly slow, and uses more memory while the
 #'    environment is loaded.
@@ -960,8 +982,9 @@ lgsub <- function
 #' because the generic functions `AnnotationDbi::ls()` and
 #' `AnnotationDbi::mget()` were written for class `"Bimap"`.
 #' So when the input `envir` class contains `"Bimap"` the
-#' direct function `AnnotationDbi::ls()` or
-#' `AnnotationDbi::mget()` is called, otherwise the generic
+#' direct function `AnnotationDbi::keys()` is called, and if it
+#' fails for some reason, `AnnotationDbi::ls()` is called,
+#' thes `AnnotationDbi::mget()` is called, otherwise the generic
 #' `ls()` or `mget()` is called.
 #' 
 #' @return named `list` of objects found, or `NA` for objects
@@ -985,7 +1008,12 @@ imget <- function
 {
    ##
    if (jamba::igrepHas("Bimap", class(envir))) {
-      keys <- AnnotationDbi::ls(envir);
+      keys <- tryCatch({
+         AnnotationDbi::keys(envir,
+            ...);
+      }, error=function(e){
+         AnnotationDbi::ls(envir);
+      });
    } else {
       keys <- ls(envir);
    }

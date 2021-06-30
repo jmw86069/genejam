@@ -1,3 +1,17 @@
+# Version 0.0.15.900
+
+## updates to existing functions
+
+* `freshenGenes()` new argument `ignore.case` which calls
+`genejam::imget()` as a drop-in replacement for `mget()`.
+The process was improved by calling `AnnotationDbi::keys()`
+instead of `AnnotationDbi::ls()`, and this change is at
+least an order of magnitude faster. In brief benchmarks,
+using `ignore.case=TRUE` adds roughly 0.1 seconds per
+annotation in `try_list`, but otherwise is the same
+speed regardless the number of input entries.
+
+
 # Version 0.0.14.900
 
 ## updates to existing functions

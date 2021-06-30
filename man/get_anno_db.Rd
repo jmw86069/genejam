@@ -22,10 +22,11 @@ example the suffix \code{"2EG"} is used to indicate that annotation
 returns Entrez gene. When annotation does not contain this suffix,
 the annotation is reverse-mapped using \code{AnnotationDbi::revmap()}.}
 
-\item{ignore.case}{logical indicating whether to return an environment
+\item{ignore.case}{\code{logical} indicating whether to return an environment
 after converting all keys to lowercase, which is one implementation
-choice to provide case-insensitive output from \code{mget()}. In order
-to fulfill the potential, the subsequent \code{mget()} must also
+choice to provide case-insensitive output while using standard
+\code{mget()}. This option may not be ideal, see description for defailts.
+In order to fulfill the potential, the subsequent \code{mget()} must also
 use \code{tolower(x)} on the input character vector. Note that this
 option is currently fairly slow, and uses more memory while the
 environment is loaded.}
@@ -45,6 +46,21 @@ or an annotation object, and returns the annotation object.
 In the event the annotation object must be derived using
 \code{AnnotationDbi::revmap()}, then that process is performed, and the
 reverse mapped annotation object is returned.
+
+When invoking with argument \code{ignore.case=TRUE}, this function
+returns keys that have been converted to lowercase. The process
+can be fairly slow (~5 seconds per human genome annotation),
+but results in an annotation that can be used directly and
+may be faster for repeated use than calling \code{imget()}.
+
+The alternative to \code{ignore.case=TRUE} is to call \code{imget()} for
+direct query of an annotation, or call \code{freshenGenes(..., ignore.case=TRUE)}
+which will call \code{imget()} internally.
+In our benchmark tests, using \code{imget()} appears to add roughly
+0.1 seconds per query, regardless of the number of input entries.
+This appears to be the time it takes to spool the list of annotation
+keys stored in the SQLite database, and may therefore be dependent upon
+the size of the annotation file.
 }
 \seealso{
 Other genejam: 

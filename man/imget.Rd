@@ -54,8 +54,9 @@ behaving properly for objects of class \code{"AnnDbBimap"}, presumably
 because the generic functions \code{AnnotationDbi::ls()} and
 \code{AnnotationDbi::mget()} were written for class \code{"Bimap"}.
 So when the input \code{envir} class contains \code{"Bimap"} the
-direct function \code{AnnotationDbi::ls()} or
-\code{AnnotationDbi::mget()} is called, otherwise the generic
+direct function \code{AnnotationDbi::keys()} is called, and if it
+fails for some reason, \code{AnnotationDbi::ls()} is called,
+thes \code{AnnotationDbi::mget()} is called, otherwise the generic
 \code{ls()} or \code{mget()} is called.
 }
 \concept{jam utility functions}

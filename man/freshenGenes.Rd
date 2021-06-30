@@ -16,6 +16,7 @@ freshenGenes(
   include_source = FALSE,
   protect_inline_sep = TRUE,
   intermediate = "intermediate",
+  ignore.case = FALSE,
   verbose = FALSE,
   ...
 )
@@ -95,6 +96,13 @@ returns Entrez gene values, so if the input \code{x} already contains
 some of these values in a column, assign that colname to
 \code{intermediate}.}
 
+\item{ignore.case}{\code{logical} indicating whether to use
+case-insensitive matching when \code{ignore.case=TRUE}, otherwise
+the default \code{ignore.case=FALSE} will perform default \code{mget()}
+which requires the upper and lowercase characters are
+an identical match. When \code{ignore.case=TRUE} this function
+calls \code{genejam::imget()}.}
+
 \item{verbose}{logical indicating whether to print verbose output.}
 }
 \value{
@@ -149,6 +157,17 @@ trail to see which annotation was available for each input entry.
 
 Note that if the input data already contains Entrez gene ID
 values, you can define that colname with argument \code{intermediate}.
+}
+
+\subsection{Case-insensitive search}{
+
+For case-insensitive search, which is particularly useful in non-human
+organisms because they often use mixed-case, use the argument
+\code{ignore.case=TRUE}. In our benchmark tests it appears to add roughly
+0.1 seconds per annotation, regardless of the number of input entries.
+This appears to be the time it takes to spool the list of annotation
+keys stored in the SQLite database, and may therefore be dependent upon
+the size of the annotation file.
 }
 }
 \examples{

@@ -1,6 +1,6 @@
 Package: genejam
 Title: Gene Jam
-Version: 0.0.14.900
+Version: 0.0.15.900
 Authors@R: c(
     person(given="James M.",
        family="Ward",
