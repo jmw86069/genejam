@@ -1,7 +1,38 @@
 # TODO for genejam
 
+## 07sep2022
 
-## Refresh 30jun2021: Optional case-insensitive lookup
+* Use case: Search for genes by description
+
+   * could involve something like pattern matching by grep
+   * For example, find "NF-KB" genes, or "NF-kB". Does it need
+   to search for the Kappa symbol?
+   * Or search for "histone" or "ubiquitin".
+
+* Consider changing default argument from `intermediate="intermediate"`,
+to `intermediate="ENTREZID"`.
+* Consider a helper function for microarray annotation.
+
+   * Annotation of Affymetrix whole exome array probesets.
+   * Annotation of Illumina whole genome tiling array.
+   * Mimic the annotation step for oligo array classes.
+
+* Consider allowing input `SummarizedExperiment`
+
+   * use either `rownames(se)` or `rowData_colnames` derived from
+   `colnames(rowData(se))`
+   * process would extract the relevant `data.frame` from `rowData(se)`,
+   then store results back into the `se` object.
+   * `freshenGenes_se(se, rowData_colnames=NULL)` would use `rownames(se)`
+   * `freshenGenes_se(se, rowData_colnames=c("AFFYID"))` would use
+   `rowData(se)[, rowData_colnames]`
+
+* Could consider input types such as `ExpressionSet`, and the oligo array
+classes that are often hard to annotate easily.
+
+## 30jun2021 (COMPLETE)
+
+COMPLETE: Optional case-insensitive lookup
 
 Current workflow requires two un-intuitive steps:
 

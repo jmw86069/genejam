@@ -1,3 +1,11 @@
+# Version 0.0.16.900
+
+## dependency update
+
+* bumped the version dependency on jamba to `0.0.87.900`, due
+to a bug introduced in `jamba::cPaste()` that adversely affected
+output for accessions that require multiple rounds of querying.
+
 # Version 0.0.15.900
 
 ## updates to existing functions
