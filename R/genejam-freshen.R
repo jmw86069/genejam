@@ -426,7 +426,7 @@ freshenGenes <- function
             ivals <- jamba::cPaste(ivals_l,
                sep=sep,
                na.rm=TRUE);
-            
+
             names(ivals) <- ixu;
             ivals <- ivals[!is.na(ivals)];
             ixnew <- ivals[match(ix, names(ivals))];
@@ -479,6 +479,7 @@ freshenGenes <- function
       xfoundu <- unique(x[[intermediate]]);
       if (length(split) > 0 && nchar(split) > 0) {
          xfounduv <- jamba::cPasteSU(strsplit(xfoundu, split),
+            na.rm=TRUE,
             sep=sep);
       } else {
          xfounduv <- xfoundu;
@@ -505,6 +506,7 @@ freshenGenes <- function
       xfoundsu <- unique(x[[intermediate_source]]);
       if (length(split) > 0 && nchar(split) > 0) {
          xfoundsuv <- jamba::cPasteU(strsplit(xfoundsu, split),
+            na.rm=TRUE,
             sep=sep);
       } else {
          xfoundsuv <- xfoundsu;
@@ -674,7 +676,8 @@ get_anno_db <- function
          if (length(revmap_suffix) > 0 && any(nchar(revmap_suffix) > 0)) {
             revmap_suffix <- revmap_suffix[nchar(revmap_suffix) > 0];
             revmap_anygrep <- paste0("(",
-               jamba::cPaste(revmap_suffix, 
+               jamba::cPaste(revmap_suffix,
+                  na.rm=TRUE,
                   sep="|"), 
                ")$");
             if (jamba::igrepHas(revmap_anygrep, x)) {
