@@ -1,5 +1,87 @@
 # TODO for genejam
 
+## 05dec2024
+
+* Consider shorthand way to specify species:
+
+   * "Hs", "Mm" - which mean `"org.Hs.eg.db"`, `"org.Mm.eg.db"`
+   * "All" - use all installed `"org.*.eg.db"` packages?
+
+* When input has delimited values, consider returning as-is
+
+   * Instead make the wide format optional, but default should match
+   the input.
+   * One key difference is `empty_rule="original"` will include the full
+   input identifier, and not the first split value.
+
+* Consider new default: `intermediate="ENTREZID"`
+* Consider new default: `ignore.case=TRUE`
+* Add examples showing how to use array annotations?
+* Consider how to include something like biomaRt methods.
+
+   * I asked Jianying Li for some examples of "goto" queries he uses.
+
+## 29jul2024
+
+* Consider enabling string search methods:
+
+   * Use case: Find all the genes where SYMBOL begins with `"IFN"`
+   * Use case: Find all genes whose GENENAME contains `"Receptor"`
+   * It could be essentially wildcard search, except that results
+   would ideally returned on separated rows. No value returning 500 receptors
+   concatenated onto one row.
+   Therefore, this workflow likely requires its own function.
+   It is not: "convert this ID to official ID" in one-to-one manner,
+   which is the goal of `freshenGenes()`.
+
+* Consider documenting an improved methylation array annotation workflow,
+or whole transcriptome array workflow.
+
+   * Start with chip annotation, follow with other Bioconductor annotations.
+
+
+## 11mar2024
+
+* `freshenGenes()` (and variants)
+
+   * Consider option to re-combine multi-column split values back to
+   the source column name. For example when genes are separated
+   into multiple columns when delimited by `split`, it can create 50+
+   column for some entries, making the output unwieldy.
+   * Consider changing default argument `intermediate="intermediate"` to
+   `intermediate="ENTREZID"`.
+   
+      * This change may break a few older RMarkdown (only for me),
+      however maybe for the best for the default use case.
+
+   * Bug review: When input contains column values, and `intermediate` column
+   which already contains partial data, it should only query the column
+   values when the `intermediate` is empty or blank, per the
+   `handle_multiple` argument.
+   Currently it appears to override or augment the existing `intermediate`
+   after also querying the column value.
+   
+
+## 29feb2024
+
+* Consider adding `biomaRt` queries to supplement the fairly limited
+coverage of EnsEMBL gene/transcript identifiers in the `"org.Hs.eg.db"`
+databases in Bioconductor. Many retired entries are not included,
+or those without 1:1 mapping to EntrezID.
+
+   * Very unclear how this step could work. Each attribute can be 1:many.
+   * Entries no longer "key" off of ENTREZID.
+
+## 23sep2022
+
+* When input column contains delimiters, it is split into multiple
+columns with one value each. However, the output `data.frame` should
+contain the original colname with original value, in proper order.
+
+   * consider adding an argument whether to include/hide the split columns
+   * consider adding an argument whether to include/hide the original column
+   
+
 ## 07sep2022
 
 * Use case: Search for genes by description
@@ -29,6 +111,7 @@ to `intermediate="ENTREZID"`.
 
 * Could consider input types such as `ExpressionSet`, and the oligo array
 classes that are often hard to annotate easily.
+
 
 ## 30jun2021 (COMPLETE)
 
