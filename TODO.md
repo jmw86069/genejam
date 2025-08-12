@@ -1,5 +1,9 @@
 # TODO for genejam
 
+## 12aug2025
+
+* Remove jamba Github dependency, point to CRAN instead.
+
 ## 05dec2024
 
 * Consider shorthand way to specify species:

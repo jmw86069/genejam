@@ -1,3 +1,9 @@
+# Version 0.0.17.900
+
+## dependency update
+
+* Bumped jamba to 1.0.4 and pointed to CRAN instead of Github.
+
 # Version 0.0.16.900
 
 ## dependency update
