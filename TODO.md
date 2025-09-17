@@ -1,5 +1,16 @@
 # TODO for genejam
 
+## 17sep2025
+
+* Investigate `"Lars"` for "org.Mm.eg.db" and `ignore.case=TRUE`,
+should return multiple results.
+
+## 08sep2025
+
+* Fix issue when intermediate has values already, but are amended
+when the gene column search produces results. In principle the
+existing value should be used without change. (?)
+
 ## 12aug2025
 
 * Remove jamba Github dependency, point to CRAN instead.
