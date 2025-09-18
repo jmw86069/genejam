@@ -21,14 +21,14 @@ freshenGenes3(
 )
 }
 \arguments{
-\item{x}{character vector or \code{data.frame} with one or most columns
+\item{x}{\code{character} vector or \code{data.frame} with one or most columns
 containing gene symbols.}
 
-\item{ann_lib}{character vector indicating the name or names of the
+\item{ann_lib}{\code{character} vector indicating the name or names of the
 Bioconductor annotation library to use when looking up
 gene nomenclature.}
 
-\item{try_list}{character vector indicating one or more names of
+\item{try_list}{\code{character} vector indicating one or more names of
 annotations to use for the input gene symbols in \code{x}. The
 annotation should typically return the Entrez gene ID, usually
 given by \code{'2EG'} at the end of the name. For example \code{SYMBOL2EG}
@@ -41,22 +41,22 @@ is requested, but only \code{"org.Hs.egALIAS2EG"} is available, then
 \code{AnnotationDbi::revmap(org.Hs.egALIAS2EG)} is used to create the
 equivalent of \code{"org.Hs.egALIAS"}.}
 
-\item{final}{character vector to use for the final conversion
+\item{final}{\code{character} vector to use for the final conversion
 step. When \code{final} is \code{NULL} no conversion is performed.
 When \code{final} contains multiple values, each value is returned
 in the output. For example, \code{final=c("SYMBOL","GENENAME")} will
 return a column \code{"SYMBOL"} and a column \code{"GENENAME"}.}
 
-\item{split}{character value used to separate delimited values in \code{x}
+\item{split}{\code{character} value used to separate delimited values in \code{x}
 by the function \code{base::strsplit()}. The default will split values
 separated by comma \verb{,} semicolon \verb{;} or forward slash \code{/}, and will
 trim whitespace before and after these delimiters.}
 
-\item{sep}{character value used to concatenate multiple entries in
+\item{sep}{\code{character} value used to concatenate multiple entries in
 the same field. The default \code{sep=","} will comma-delimit multiple
 entries in the same field.}
 
-\item{handle_multiple}{character value indicating how to handle multiple
+\item{handle_multiple}{\code{character} value indicating how to handle multiple
 values: \code{"first_hit"} will query each column of \code{x} until it finds the
 first possible returning match, and will ignore all subsequent possible
 matches for that row in \code{x}. For example, if one row in \code{x} contains
@@ -68,18 +68,18 @@ values, the first match from \code{try_list} using one or both columns in
 attempted for rows that already have a match. \code{"all"} will return all
 possible matches for all entries in \code{x} using all items in \code{try_list}.}
 
-\item{empty_rule}{character value indicating how to handle entries which
+\item{empty_rule}{\code{character} value indicating how to handle entries which
 did not have a match, and are therefore empty: \code{"original"} will use
 the original entry as the output field; \code{"empty"} will leave the
 entry blank.}
 
-\item{include_source}{logical indicating whether to include a column
+\item{include_source}{\code{logical} indicating whether to include a column
 that shows the colname and source matched. For example, if column
 \code{"original_gene"} matched \code{"SYMBOL2EG"} in \code{"org.Hs.eg.db"} there
 will be a column \code{"found_source"} with value
 \code{"original_gene.org.Hs.egSYMBOL2EG"}.}
 
-\item{protect_inline_sep}{logical indicating whether to
+\item{protect_inline_sep}{\code{logical} indicating whether to
 protect inline characters in \code{sep}, to prevent them from
 being used to split single values into multiple values.
 For example, \code{"GENENAME"} returns the full gene name, which
@@ -95,7 +95,7 @@ returns Entrez gene values, so if the input \code{x} already contains
 some of these values in a column, assign that colname to
 \code{intermediate}.}
 
-\item{verbose}{logical indicating whether to print verbose output.}
+\item{verbose}{\code{logical} indicating whether to print verbose output.}
 }
 \description{
 Freshen gene annotations using Bioconductor annotation data
@@ -111,8 +111,8 @@ attributed to the gene.
 }
 \seealso{
 Other genejam: 
-\code{\link{freshenGenes2}()},
 \code{\link{freshenGenes}()},
+\code{\link{freshenGenes2}()},
 \code{\link{get_anno_db}()},
 \code{\link{is_empty}()}
 }

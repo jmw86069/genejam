@@ -2,14 +2,27 @@
 
 ## 17sep2025
 
-* Investigate `"Lars"` for "org.Mm.eg.db" and `ignore.case=TRUE`,
+* DONE. Investigate `"Lars"` for "org.Mm.eg.db" and `ignore.case=TRUE`,
 should return multiple results.
 
-## 08sep2025
+   * Issue was caused by using `match(x, tolower(y))` where it would only
+   match the first valid value. Rare cases where different cases
+   are stored, for example: `"Lars", "LARS"`. There are 1222 such cases
+   of 184641 in org.Mm.egALIAS2EG as of 17sep2025, with 2 or 3 instances
+   of the same lowercase alias, for example: `"cal", "Cal", "CAL"`.
+   The previous behavior would only return the first aliases associated,
+   which in many cases was already correct - however in other rarer
+   cases there were additional values associated with the alternative-case
+   aliases.
 
-* Fix issue when intermediate has values already, but are amended
-when the gene column search produces results. In principle the
-existing value should be used without change. (?)
+* Resolve issue when intermediate has values already, and are amended
+when the gene column search produces results.
+
+   * Decide whether the existing value should be used without change,
+   or amended with new values.
+
+* Consider option to re-collapse expanded columns, e.g. comma-delimited
+values at input.
 
 ## 12aug2025
 

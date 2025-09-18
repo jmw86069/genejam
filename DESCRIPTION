@@ -1,6 +1,6 @@
 Package: genejam
 Title: Gene Jam
-Version: 0.0.17.900
+Version: 0.0.18.900
 Authors@R: c(
     person(given="James M.",
        family="Ward",
@@ -20,4 +20,4 @@ URL: http://github.com/jmw86069/genejam
 BugReports: http://github.com/jmw86069/genejam/issues
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.3.2

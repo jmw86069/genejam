@@ -72,8 +72,28 @@ imget <- function
    valuesu <- as.list(rep(NA, length(xlu)));
    names(valuesu) <- xlu;
    
+   ## Subset relevant keys
+   subkeys <- keys[tolower(keys) %in% xlu];
+   
+   ## Check for duplicated case-insensitive keys
+   if (any(duplicated(tolower(subkeys)))) {
+      lcdupekeys <- unique(tolower(subkeys)[duplicated(tolower(subkeys))])
+      alldupekeys <- subkeys[tolower(subkeys) %in% lcdupekeys]
+      alldupekeys_list <- split(alldupekeys, tolower(alldupekeys))
+      #
+      ivals <- AnnotationDbi::mget(alldupekeys, envir)
+      dupekey_list <- split(unlist(unname(ivals)),
+         rep(tolower(names(ivals)), lengths(ivals)))
+      # sorts
+      dupekey_list <- jamba::mixedSorts(dupekey_list)
+      imatch <- match(names(dupekey_list), xlu)
+      valuesu[imatch] <- dupekey_list;
+   }
+   
    ## Match unique lowercase input to lowercase keys
    keymatch <- match(xlu, tolower(keys));
+   # if values were already assigned, set them NA here to avoid re-assigning
+   keymatch[lengths(valuesu) > 0] <- NA;
    keysfound <- !is.na(keymatch);
    if (any(keysfound)) {
       if (jamba::igrepHas("Bimap", class(envir))) {

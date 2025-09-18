@@ -64,9 +64,9 @@ the size of the annotation file.
 }
 \seealso{
 Other genejam: 
+\code{\link{freshenGenes}()},
 \code{\link{freshenGenes2}()},
 \code{\link{freshenGenes3}()},
-\code{\link{freshenGenes}()},
 \code{\link{is_empty}()}
 }
 \concept{genejam}

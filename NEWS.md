@@ -1,3 +1,24 @@
+# Version 0.0.18.900
+
+## bug fixes
+
+* Previously `ignore.case=TRUE` could in rare cases return a subset of
+associated genes, only when there were multiple alias values which
+differed only in case, for example `"cal", "Cal", "CAL"`.
+This issue only affects values with mixed-case, thus all human entries
+are unlikely to be affected (most human gene symbols are already UPPERCASE.)
+Somebody out there recognizes this case, since 'cal', 'Cal', 'CAL' each
+map 1-to-1 with one Entrez gene, 'Gopc', 'Fblim1', 'S100a11',
+respectively. Bless.
+
+## notable changes to existing functions
+
+* `freshenGenes()`
+
+   * When input data contains colname equal to argument `intermediate`,
+   existing values in that column are considered "complete" and will not
+   have additional values amended alongside them.
+
 # Version 0.0.17.900
 
 ## dependency update

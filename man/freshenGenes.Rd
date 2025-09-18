@@ -22,14 +22,14 @@ freshenGenes(
 )
 }
 \arguments{
-\item{x}{character vector or \code{data.frame} with one or most columns
+\item{x}{\code{character} vector or \code{data.frame} with one or most columns
 containing gene symbols.}
 
-\item{ann_lib}{character vector indicating the name or names of the
+\item{ann_lib}{\code{character} vector indicating the name or names of the
 Bioconductor annotation library to use when looking up
 gene nomenclature.}
 
-\item{try_list}{character vector indicating one or more names of
+\item{try_list}{\code{character} vector indicating one or more names of
 annotations to use for the input gene symbols in \code{x}. The
 annotation should typically return the Entrez gene ID, usually
 given by \code{'2EG'} at the end of the name. For example \code{SYMBOL2EG}
@@ -42,22 +42,22 @@ is requested, but only \code{"org.Hs.egALIAS2EG"} is available, then
 \code{AnnotationDbi::revmap(org.Hs.egALIAS2EG)} is used to create the
 equivalent of \code{"org.Hs.egALIAS"}.}
 
-\item{final}{character vector to use for the final conversion
+\item{final}{\code{character} vector to use for the final conversion
 step. When \code{final} is \code{NULL} no conversion is performed.
 When \code{final} contains multiple values, each value is returned
 in the output. For example, \code{final=c("SYMBOL","GENENAME")} will
 return a column \code{"SYMBOL"} and a column \code{"GENENAME"}.}
 
-\item{split}{character value used to separate delimited values in \code{x}
+\item{split}{\code{character} value used to separate delimited values in \code{x}
 by the function \code{base::strsplit()}. The default will split values
 separated by comma \verb{,} semicolon \verb{;} or forward slash \code{/}, and will
 trim whitespace before and after these delimiters.}
 
-\item{sep}{character value used to concatenate multiple entries in
+\item{sep}{\code{character} value used to concatenate multiple entries in
 the same field. The default \code{sep=","} will comma-delimit multiple
 entries in the same field.}
 
-\item{handle_multiple}{character value indicating how to handle multiple
+\item{handle_multiple}{\code{character} value indicating how to handle multiple
 values: \code{"first_hit"} will query each column of \code{x} until it finds the
 first possible returning match, and will ignore all subsequent possible
 matches for that row in \code{x}. For example, if one row in \code{x} contains
@@ -69,18 +69,18 @@ values, the first match from \code{try_list} using one or both columns in
 attempted for rows that already have a match. \code{"all"} will return all
 possible matches for all entries in \code{x} using all items in \code{try_list}.}
 
-\item{empty_rule}{character value indicating how to handle entries which
+\item{empty_rule}{\code{character} value indicating how to handle entries which
 did not have a match, and are therefore empty: \code{"original"} will use
 the original entry as the output field; \code{"empty"} will leave the
 entry blank.}
 
-\item{include_source}{logical indicating whether to include a column
+\item{include_source}{\code{logical} indicating whether to include a column
 that shows the colname and source matched. For example, if column
 \code{"original_gene"} matched \code{"SYMBOL2EG"} in \code{"org.Hs.eg.db"} there
 will be a column \code{"found_source"} with value
 \code{"original_gene.org.Hs.egSYMBOL2EG"}.}
 
-\item{protect_inline_sep}{logical indicating whether to
+\item{protect_inline_sep}{\code{logical} indicating whether to
 protect inline characters in \code{sep}, to prevent them from
 being used to split single values into multiple values.
 For example, \code{"GENENAME"} returns the full gene name, which
@@ -103,7 +103,7 @@ which requires the upper and lowercase characters are
 an identical match. When \code{ignore.case=TRUE} this function
 calls \code{genejam::imget()}.}
 
-\item{verbose}{logical indicating whether to print verbose output.}
+\item{verbose}{\code{logical} indicating whether to print verbose output.}
 }
 \value{
 \code{data.frame} with one or more columns indicating the input
@@ -121,9 +121,19 @@ official gene symbol.
 
 The annotation process runs in two basic steps:
 \enumerate{
-\item \strong{Convert the input gene to Entrez gene ID}.
-\item \strong{Convert Entrez gene ID to official gene symbol}.
+\item \strong{Convert the input gene to Entrez gene ID} (\code{intermediate}).
+\item \strong{Convert Entrez gene ID to official gene symbol} (\code{final}).
 }
+
+The \code{intermediate} depends upon the annotation used, but in the
+default condition, most Bioconductor gene-centric annotation sources
+are focused on \code{ENTREZID} as the primary key for integration.
+
+During Step 1 above, values are successively queried to obtain
+a successful conversion to \code{intermediate}, the specific logic for which
+is controlled by \code{handle_multiple}. However, once the criteria
+are met which produces valid \code{intermediate}, the value or values
+in the \code{intermediate} are then used for Step 2 above.
 \subsection{Step 1. Convert to Entrez gene ID}{
 
 The first step uses an ordered list of annotations,
@@ -159,15 +169,40 @@ Note that if the input data already contains Entrez gene ID
 values, you can define that colname with argument \code{intermediate}.
 }
 
+\subsection{Pre-existing intermediate values}{
+
+When input data contains a column that matches argument \code{intermediate},
+the intention is for pre-existing values to be honored and maintained.
+As a result, pre-existing non-empty values in \code{intermediate} are kept
+without being updated. For example, in a \code{data.frame} that contains
+colnames 'gene' and 'intermediate', and values are present in both
+columns for a given row, the value in 'intermediate' is used without
+also querying the value in 'gene' for that row.
+}
+
 \subsection{Case-insensitive search}{
 
-For case-insensitive search, which is particularly useful in non-human
-organisms because they often use mixed-case, use the argument
-\code{ignore.case=TRUE}. In our benchmark tests it appears to add roughly
-0.1 seconds per annotation, regardless of the number of input entries.
-This appears to be the time it takes to spool the list of annotation
-keys stored in the SQLite database, and may therefore be dependent upon
-the size of the annotation file.
+Case-insensitive search is particularly useful in non-human
+organisms because they often use mixed-case gene symbols.
+This support is enabled with the argument \code{ignore.case=TRUE}.
+In our benchmark tests it appears to add roughly
+0.1 seconds per annotation in \code{try_list}, regardless of the
+number of input entries in \code{x}. It seems reasonable that the
+cost may increase with annotation size, although in practice
+the time dependency does not seem to be notably affected by
+annotation size.
+
+This time cost is related to the process of converting all \code{keys()}
+in the annotation to lowercase, plus relatively minimal time to
+handle scenarios where multiple keys in mixed case (capitalization)
+are converted to the same lowercase key, for example 'CAL', 'Cal', 'cal'
+are all recognized as 'cal', and all associated connections are combined.
+This secondary step was added in version 0.0.18.900. Prior to that
+version, only the first such matching lowercase result was used.
+
+For the vast majority of gene-based queries involving human, this
+step is not necessary and produces identical results. The reason is
+that human gene symbols are entirely UPPERCASE.
 }
 }
 \examples{
