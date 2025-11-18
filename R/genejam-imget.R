@@ -68,8 +68,8 @@ imget <- function
    xlu <- unique(xl);
    xmatch <- match(xl, xlu);
    
-   ## Prepare an empty output list
-   valuesu <- as.list(rep(NA, length(xlu)));
+   ## Prepare an empty output list, not using NA
+   valuesu <- rep(list(character(0)), length(xlu));
    names(valuesu) <- xlu;
    
    ## Subset relevant keys
@@ -77,6 +77,12 @@ imget <- function
    
    ## Check for duplicated case-insensitive keys
    if (any(duplicated(tolower(subkeys)))) {
+      if (verbose) {
+         jamba::printDebug("imget(): ",
+            "Detected ",
+            jamba::formatInt(sum(duplicated(tolower(subkeys)))),
+            " duplicate case-insensitive keys, mitigating.");
+      }
       lcdupekeys <- unique(tolower(subkeys)[duplicated(tolower(subkeys))])
       alldupekeys <- subkeys[tolower(subkeys) %in% lcdupekeys]
       alldupekeys_list <- split(alldupekeys, tolower(alldupekeys))
@@ -89,11 +95,13 @@ imget <- function
       imatch <- match(names(dupekey_list), xlu)
       valuesu[imatch] <- dupekey_list;
    }
-   
+
    ## Match unique lowercase input to lowercase keys
    keymatch <- match(xlu, tolower(keys));
+
    # if values were already assigned, set them NA here to avoid re-assigning
    keymatch[lengths(valuesu) > 0] <- NA;
+   
    keysfound <- !is.na(keymatch);
    if (any(keysfound)) {
       if (jamba::igrepHas("Bimap", class(envir))) {

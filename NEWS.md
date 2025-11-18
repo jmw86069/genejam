@@ -1,3 +1,30 @@
+# Version 0.0.19.900
+
+* Moved 'AnnotationDbi' to Imports.
+## Bug Fixes
+
+* Fixed regression from 0.0.18.900 in "first_try" that caused it to
+behave like "first hit".
+* Fixed regression with `ignore.case=TRUE` caused by the correction
+to handle multiple identical values when converted to lowercase.
+* Added testthat with confirmation of `ignore.case=TRUE`,
+`revert_split=TRUE`, sources, etc.
+
+## Changes to existing functions
+
+* `freshenGenes()`
+
+   * New argument `revert_split=TRUE` will re-combine columns previously
+   split by argument `split`. The process took delimited values, split
+   them into individual columns, then performed matching on the singular
+   values. Previously data were left as-is for review, however the new
+   default is to combine columns using `sep` as delimiter, for consistency
+   with the delimiter style of this function.
+   * New default value for argument `intermediate="ENTREZID"`.
+   Previous `'intermediate'` was not useful or informative, although it
+   was flexible. It is still flexible, but the default case is now informative.
+
+
 # Version 0.0.18.900
 
 ## bug fixes

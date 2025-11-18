@@ -1,22 +1,42 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 Genejam is intended to freshen gene annotations to the current official
 standard. It is particularly useful when comparing genes in two
 datasets, for example when those datasets may not be using the same gene
 symbols to represent equivalent genes.
 
+The notable behavior is that it uses the “best available” source of
+annotation cross-reference, with ordered logic.
+
+1.  If there is a perfect match by ENTREZID, it uses that.
+2.  If the Entrez gene SYMBOL is a perfect match, it uses that.
+3.  If the entry matches an accession number directly, it uses that.
+4.  If the entry matches an ALIAS, it uses that.
+
+Other important features:
+
+- For any input which matches more than one entry, multiple values are
+  returned.
+- The query can use case-insensitive steps, which is helpful for mouse
+  gene symbols which are mixed-case “Ccl8”.
+
+The most error-prone cross-reference is `'ALIAS'`. Each step up the
+chain has more confidence. So it makes sense to start with the highest
+confidence, at the top of the list, then proceed down the list, only as
+needed.
+
 ## Installation
 
 Install using the `remotes` package:
 
-`remotes::install_github("jmw86069/genejam")`
+``` r
+remotes::install_github("jmw86069/genejam")
+```
 
-Note: It is recommended not to use the `devtools` package to install
-Github packages, mostly because the `devtools` package has many more
-components than are required for installation. Instead, `devtools`
-includes all components needed to develop R packages, beyond the scope
-of installing one such R package.
+or with the `pak` package:
+
+``` r
+pak::pkg_install("jmw86069/genejam")
+```
 
 ## freshenGenes()
 
@@ -28,11 +48,11 @@ genejam::freshenGenes(c("APOE", "APOA", "HIST1H1C"))
 
 <div class="kable-table">
 
-| input    | intermediate | SYMBOL |
-| :------- | :----------- | :----- |
-| APOE     | 348          | APOE   |
-| APOA     | 4018         | LPA    |
-| HIST1H1C | 3006         | H1-2   |
+| input    | ENTREZID | SYMBOL |
+|:---------|:---------|:-------|
+| APOE     | 348      | APOE   |
+| APOA     | 4018     | LPA    |
+| HIST1H1C | 3006     | H1-2   |
 
 </div>
 
@@ -49,11 +69,11 @@ genejam::freshenGenes(c("APOE", "APOA", "HIST1H1C"),
 
 <div class="kable-table">
 
-| input    | intermediate | SYMBOL | GENENAME                            | ALIAS                             |
-| :------- | :----------- | :----- | :---------------------------------- | :-------------------------------- |
-| APOE     | 348          | APOE   | apolipoprotein E                    | AD2,APO-E,ApoE4,APOE,LDLCQ5,LPG   |
-| APOA     | 4018         | LPA    | lipoprotein(a)                      | AK38,APOA,LP,LPA                  |
-| HIST1H1C | 3006         | H1-2   | H1.2 linker histone, cluster member | H1-2,H1.2,H1C,H1F2,H1s-1,HIST1H1C |
+| input | ENTREZID | SYMBOL | GENENAME | ALIAS |
+|:---|:---|:---|:---|:---|
+| APOE | 348 | APOE | apolipoprotein E | AD2,APO-E,ApoE4,APOE,LDLCQ5,LPG |
+| APOA | 4018 | LPA | lipoprotein(a) | AK38,APOA,LP,LPA |
+| HIST1H1C | 3006 | H1-2 | H1.2 linker histone, cluster member | H1-2,H1.2,H1C,H1F2,H1s-1,HIST1H1C |
 
 </div>
 
@@ -69,11 +89,11 @@ genejam::freshenGenes2(c("APOE", "APOA", "HIST1H1C"))
 
 <div class="kable-table">
 
-| input    | intermediate | SYMBOL | GENENAME                            |
-| :------- | :----------- | :----- | :---------------------------------- |
-| APOE     | 348          | APOE   | apolipoprotein E                    |
-| APOA     | 4018         | LPA    | lipoprotein(a)                      |
-| HIST1H1C | 3006         | H1-2   | H1.2 linker histone, cluster member |
+| input    | ENTREZID | SYMBOL | GENENAME                            |
+|:---------|:---------|:-------|:------------------------------------|
+| APOE     | 348      | APOE   | apolipoprotein E                    |
+| APOA     | 4018     | LPA    | lipoprotein(a)                      |
+| HIST1H1C | 3006     | H1-2   | H1.2 linker histone, cluster member |
 
 </div>
 
@@ -88,11 +108,11 @@ genejam::freshenGenes3(c("APOE", "APOA", "HIST1H1C"))
 
 <div class="kable-table">
 
-| input    | intermediate | SYMBOL | GENENAME                            | ALIAS                             |
-| :------- | :----------- | :----- | :---------------------------------- | :-------------------------------- |
-| APOE     | 348          | APOE   | apolipoprotein E                    | AD2,APO-E,ApoE4,APOE,LDLCQ5,LPG   |
-| APOA     | 4018         | LPA    | lipoprotein(a)                      | AK38,APOA,LP,LPA                  |
-| HIST1H1C | 3006         | H1-2   | H1.2 linker histone, cluster member | H1-2,H1.2,H1C,H1F2,H1s-1,HIST1H1C |
+| input | ENTREZID | SYMBOL | GENENAME | ALIAS |
+|:---|:---|:---|:---|:---|
+| APOE | 348 | APOE | apolipoprotein E | AD2,APO-E,ApoE4,APOE,LDLCQ5,LPG |
+| APOA | 4018 | LPA | lipoprotein(a) | AK38,APOA,LP,LPA |
+| HIST1H1C | 3006 | H1-2 | H1.2 linker histone, cluster member | H1-2,H1.2,H1C,H1F2,H1s-1,HIST1H1C |
 
 </div>
 
@@ -119,7 +139,7 @@ genejam::freshenGenes2(x=df, intermediate="ENTREZID")
 <div class="kable-table">
 
 | ENTREZID | SYMBOL | GENENAME                            |
-| :------- | :----- | :---------------------------------- |
+|:---------|:-------|:------------------------------------|
 | 348      | APOE   | apolipoprotein E                    |
 | 4018     | LPA    | lipoprotein(a)                      |
 | 3006     | H1-2   | H1.2 linker histone, cluster member |
@@ -139,7 +159,7 @@ idf
 <div class="kable-table">
 
 | Gene   | ENTREZID |
-| :----- | :------- |
+|:-------|:---------|
 | MINA   |          |
 |        | 84864    |
 | GABRR3 |          |
@@ -156,13 +176,13 @@ genejam::freshenGenes2(x=idf, intermediate="ENTREZID")
 
 <div class="kable-table">
 
-| Gene   | ENTREZID | SYMBOL | GENENAME                                                               |
-| :----- | :------- | :----- | :--------------------------------------------------------------------- |
-| MINA   | 84864    | RIOX2  | ribosomal oxygenase 2                                                  |
-|        | 84864    | RIOX2  | ribosomal oxygenase 2                                                  |
-| GABRR3 | 200959   | GABRR3 | gamma-aminobutyric acid type A receptor rho3 subunit (gene/pseudogene) |
-| GABRR3 | 200959   | GABRR3 | gamma-aminobutyric acid type A receptor rho3 subunit (gene/pseudogene) |
-|        | 200959   | GABRR3 | gamma-aminobutyric acid type A receptor rho3 subunit (gene/pseudogene) |
+| Gene   | ENTREZID | SYMBOL | GENENAME                                             |
+|:-------|:---------|:-------|:-----------------------------------------------------|
+| MINA   | 84864    | RIOX2  | ribosomal oxygenase 2                                |
+|        | 84864    | RIOX2  | ribosomal oxygenase 2                                |
+| GABRR3 | 200959   | GABRR3 | gamma-aminobutyric acid type A receptor subunit rho3 |
+| GABRR3 | 200959   | GABRR3 | gamma-aminobutyric acid type A receptor subunit rho3 |
+|        | 200959   | GABRR3 | gamma-aminobutyric acid type A receptor subunit rho3 |
 
 </div>
 
@@ -196,13 +216,13 @@ sequence accession number used to design the assay.
 
 As a result, a “best possible” gene annotation strategy is used.
 
-  - When Entrez gene ID is available, use it.
-  - When Entrez official gene symbol is available, use that to determine
-    the Entrez gene ID.
-  - When a sequence accession used for assay design is available, use
-    that to determine the associated Entrez gene ID value or values.
-  - When a gene symbol alias is available, use that to determine the
-    Entrez gene ID value or values associated with this alias.
+- When Entrez gene ID is available, use it.
+- When Entrez official gene symbol is available, use that to determine
+  the Entrez gene ID.
+- When a sequence accession used for assay design is available, use that
+  to determine the associated Entrez gene ID value or values.
+- When a gene symbol alias is available, use that to determine the
+  Entrez gene ID value or values associated with this alias.
 
 Sometimes an assay measures two genes. The steps in `genejam` are
 designed to maintain multi-gene associations where necessary. If one

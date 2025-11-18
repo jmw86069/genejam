@@ -122,19 +122,28 @@
 #'    by the function `base::strsplit()`. The default will split values
 #'    separated by comma `,` semicolon `;` or forward slash `/`, and will
 #'    trim whitespace before and after these delimiters.
+#' @param revert_split `logical` default TRUE, whether to revert the
+#'    internal split with argument `split`, which causes columns with
+#'    delimited values to be split into single value per column.
+#'    When `revert_split=TRUE` the columns are re-combined to match
+#'    the original data. Note that values are combined using `sep`
+#'    as delimiter, which may not be identical to the input data.
 #' @param sep `character` value used to concatenate multiple entries in
 #'    the same field. The default `sep=","` will comma-delimit multiple
 #'    entries in the same field.
 #' @param handle_multiple `character` value indicating how to handle multiple
-#'    values: `"first_hit"` will query each column of `x` until it finds the
+#'    values:
+#'    * `"first_hit"` will query each column of `x` until it finds the
 #'    first possible returning match, and will ignore all subsequent possible
 #'    matches for that row in `x`. For example, if one row in `x` contains
-#'    multiple values, only the first match will be used. `"first_try"`
+#'    multiple values, only the first match will be used.
+#'    * `"first_try"`
 #'    will return the first match from `try_list` for all columns in `x`
 #'    that contain a match. For example, if one row in `x` contains two
 #'    values, the first match from `try_list` using one or both columns in
 #'    `x` will be maintained. Subsequent entries in `try_list` will not be
-#'    attempted for rows that already have a match. `"all"` will return all
+#'    attempted for rows that already have a match.
+#'    * `"all"` will return all
 #'    possible matches for all entries in `x` using all items in `try_list`.
 #' @param empty_rule `character` value indicating how to handle entries which
 #'    did not have a match, and are therefore empty: `"original"` will use
@@ -194,12 +203,16 @@
 #' 
 #' if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
 #'    ## More advanced, match affymetrix probesets
-#'    if (suppressPackageStartupMessages(require(hgu133plus2.db))) {
+#'    if (requireNamespace("hgu133plus2.db", quietly=TRUE) &&
+#'       suppressPackageStartupMessages(require("hgu133plus2.db"))) {
 #'       cat("\nAdvanced example including Affymetrix probesets.\n");
-#'       print(freshenGenes(c("227047_x_at","APOE","HIST1H1D","NM_003166,U08032"),
+#'       affy_df <- freshenGenes(
+#'          c("227047_x_at", "APOE", "HIST1H1D", "NM_003166,U08032"),
 #'          include_source=TRUE,
-#'          try_list=c("hgu133plus2ENTREZID","REFSEQ2EG","SYMBOL2EG","ACCNUM2EG","ALIAS2EG"),
-#'          final=c("SYMBOL","GENENAME")))
+#'          try_list=c("hgu133plus2ENTREZID", "REFSEQ2EG",
+#'             "SYMBOL2EG", "ACCNUM2EG", "ALIAS2EG"),
+#'          final=c("SYMBOL", "GENENAME"))
+#'       print(affy_df)
 #'    }
 #' }
 #' 
@@ -210,12 +223,13 @@ freshenGenes <- function
  try_list=c("SYMBOL2EG", "ACCNUM2EG", "ALIAS2EG"),
  final=c("SYMBOL"),
  split="[ ]*[,/;]+[ ]*",
+ revert_split=TRUE,
  sep=",",
  handle_multiple=c("first_try", "first_hit", "all", "best_each"),
  empty_rule=c("empty", "original", "na"),
  include_source=FALSE,
  protect_inline_sep=TRUE,
- intermediate="intermediate",
+ intermediate="ENTREZID",
  ignore.case=FALSE,
  verbose=FALSE,
  ...)
@@ -317,7 +331,9 @@ freshenGenes <- function
    ## Expand columns containing delimited values if necessary
    # This step makes multiple values appear in separate columns
    # on the same row.
+   x_newsplit_colnames <- NULL;
    if (length(split) > 0 && nchar(split) > 0) {
+      x_input_colnames <- colnames(x);
       x <- data.frame(stringsAsFactors=FALSE,
          check.names=FALSE,
          do.call(cbind,
@@ -337,6 +353,9 @@ freshenGenes <- function
             })
          )
       );
+      x_newsplit_colnames <- setdiff(colnames(x), x_input_colnames);
+      # jamba::printDebug("x_newsplit_colnames:");print(x_newsplit_colnames);# debug
+      # jamba::printDebug("head(x, 5):");print(head(x, 5));# debug
    }
    # updated to ignore intermediate and intermediate_source
    xnames <- setdiff(colnames(x),
@@ -387,9 +406,19 @@ freshenGenes <- function
          if (length(ienv) == 0) {
             if (verbose) {
                jamba::printDebug("freshenGenes(): ",
-                  "   Skipping", fgText=c("darkorange1", "red"));
+                  "   Skipping, no environment to use",
+                  fgText=c("darkorange1", "red"));
             }
             next;
+         }
+
+         # 0.0.19.900: track which were empty upfront before trying columns
+         intermediate_empty <- is_empty(x[[intermediate]])
+         if (verbose) {
+            jamba::printDebug("freshenGenes(): ",
+               "upfront intermediate_empty: ", intermediate_empty);
+            jamba::printDebug("freshenGenes(): ",
+               "upfront intermediate: ", intermediate);
          }
          
          for (iname in xnames) {
@@ -400,6 +429,7 @@ freshenGenes <- function
             }
             ifound <- x[[intermediate]];
             ifound_source <- x[[intermediate_source]];
+            
             if ("first_hit" %in% handle_multiple) {
                ## input must have characters
                ## must have no found result
@@ -409,8 +439,10 @@ freshenGenes <- function
                ## input must have characters
                ## previous try must have no result
                # 0.0.18.900 - ensure intermediate is also empty
+               # 0.0.19.900 - but since the last try
                ido <- (x[["found_try"]] &
-                     genejam::is_empty(ifound) &
+                     # genejam::is_empty(ifound) &
+                     intermediate_empty &
                      !genejam::is_empty(x[[iname]]));
             } else {
                ## input must have characters, and not be empty
@@ -433,10 +465,11 @@ freshenGenes <- function
                   fgText=c("darkorange1", "aquamarine3"));
             }
             ixu <- jamba::rmNA(as.character(unique(ix)));
-            if (ignore.case) {
+            if (isTRUE(ignore.case)) {
                ivals_l <- imget(ixu,
                   ienv,
-                  ifnotfound=NA);
+                  ifnotfound=NA,
+                  verbose=verbose);
             } else {
                ivals_l <- AnnotationDbi::mget(ixu,
                   ienv,
@@ -506,7 +539,7 @@ freshenGenes <- function
    ###################################
    ## Optionally remove found_source
    if (!include_source) {
-      x <- x[,setdiff(colnames(x), intermediate_source),drop=FALSE];
+      x <- x[, setdiff(colnames(x), intermediate_source), drop=FALSE];
    }
    
    ###################################
@@ -569,7 +602,7 @@ freshenGenes <- function
       #      xnames),
       #   renameFirst=FALSE);
       #colnames(x) <- xnames;
-      
+
       ## LOC# recovery for entries that have no intermediate
       # 30mar2021 this change in isempty should be slightly faster
       #isempty <- (nchar(jamba::rmNA(naValue="", x[[intermediate]])) == 0);
@@ -594,11 +627,33 @@ freshenGenes <- function
                x[[xnames1]][isempty][isloc]);
          }
       }
+      
+      ###################################
+      ## 0.0.19.900: Revert input colnames
+      if (isTRUE(revert_split) && length(x_newsplit_colnames) > 0) {
+         #
+         # x_newsplit_factor <- gsub("_v[0-9]+$", "", x_newsplit_colnames);
+         x_newsplit_factor <- gsub("_v[0-9]+$", "", colnames(x));
+         x_newsplit_factor <- factor(x_newsplit_factor,
+            levels=unique(x_newsplit_factor))
+         # x_newsplit <- split(x_newsplit_colnames, x_newsplit_factor)
+         x_newsplit <- split(colnames(x), x_newsplit_factor)
+         
+         # concatenate values split across columns
+         x_cols <- lapply(x_newsplit, function(icols){
+            jamba::pasteByRow(x[, icols, drop=FALSE],
+               sep=sep)
+         })
+         x <- data.frame(check.names=FALSE,
+            do.call(cbind, x_cols));
+      }
+      
       if (verbose) {
          jamba::printDebug("freshenGenes(): ",
             "Processing final data.frame, head(x, 10):");
          print(head(x, 10));
       }
+
       for (i in final) {
          if (verbose) {
             jamba::printDebug("freshenGenes(): ",
@@ -611,6 +666,7 @@ freshenGenes <- function
             split=sep,
             handle_multiple=handle_multiple,
             ann_lib=ann_lib,
+            revert_split=FALSE,
             try_list=i,
             final=NULL,
             include_source=FALSE,
@@ -618,12 +674,10 @@ freshenGenes <- function
             verbose=verbose > 1,
             ...);
          x[[i]] <- x1[[i]];
-         # This step should not be necessary for "final"
-         #if (include_source) {
-         #   i_source <- paste0(i, "_source");
-         #   x[[i_source]] <- x1[[i_source]];
-         #}
       }
+      
+      # 0.0.19.900: revert the split columns
+      
       if ("original" %in% empty_rule) {
          ifinal <- head(final, 1);
          # 30mar2021 this change in isempty should be slightly faster

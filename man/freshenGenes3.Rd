@@ -15,7 +15,7 @@ freshenGenes3(
   empty_rule = c("empty", "original", "na"),
   include_source = FALSE,
   protect_inline_sep = TRUE,
-  intermediate = "intermediate",
+  intermediate = "ENTREZID",
   verbose = FALSE,
   ...
 )
@@ -57,16 +57,21 @@ the same field. The default \code{sep=","} will comma-delimit multiple
 entries in the same field.}
 
 \item{handle_multiple}{\code{character} value indicating how to handle multiple
-values: \code{"first_hit"} will query each column of \code{x} until it finds the
+values:
+\itemize{
+\item \code{"first_hit"} will query each column of \code{x} until it finds the
 first possible returning match, and will ignore all subsequent possible
 matches for that row in \code{x}. For example, if one row in \code{x} contains
-multiple values, only the first match will be used. \code{"first_try"}
+multiple values, only the first match will be used.
+\item \code{"first_try"}
 will return the first match from \code{try_list} for all columns in \code{x}
 that contain a match. For example, if one row in \code{x} contains two
 values, the first match from \code{try_list} using one or both columns in
 \code{x} will be maintained. Subsequent entries in \code{try_list} will not be
-attempted for rows that already have a match. \code{"all"} will return all
-possible matches for all entries in \code{x} using all items in \code{try_list}.}
+attempted for rows that already have a match.
+\item \code{"all"} will return all
+possible matches for all entries in \code{x} using all items in \code{try_list}.
+}}
 
 \item{empty_rule}{\code{character} value indicating how to handle entries which
 did not have a match, and are therefore empty: \code{"original"} will use

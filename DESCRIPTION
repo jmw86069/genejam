@@ -1,6 +1,6 @@
 Package: genejam
 Title: Gene Jam
-Version: 0.0.18.900
+Version: 0.0.19.900
 Authors@R: c(
     person(given="James M.",
        family="Ward",
@@ -11,8 +11,13 @@ Authors@R: c(
 Description: Gene annotation utility functions.
 biocViews:
 Depends: R (>= 3.6.0)
-Imports: jamba (>= 1.0.4)
-Suggests: AnnotationDbi,org.Hs.eg.db
+Imports: jamba (>= 1.0.4),
+    AnnotationDbi
+Suggests:
+    org.Hs.eg.db,
+    testthat (>= 3.0.0)
+Enhances:
+    org.Mm.eg.db
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
@@ -20,4 +25,5 @@ URL: http://github.com/jmw86069/genejam
 BugReports: http://github.com/jmw86069/genejam/issues
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
+Config/testthat/edition: 3

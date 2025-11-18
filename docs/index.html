@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gene Jam • genejam</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">genejam</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.15.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.19.900</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -52,9 +48,9 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="http://github.com/jmw86069/genejam/">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
+  <a href="http://github.com/jmw86069/genejam/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
+
   </a>
 </li>
       </ul>
@@ -65,44 +61,60 @@
 </div>
 <!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="contents col-md-9">
 
 <p>Genejam is intended to freshen gene annotations to the current official standard. It is particularly useful when comparing genes in two datasets, for example when those datasets may not be using the same gene symbols to represent equivalent genes.</p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+<p>The notable behavior is that it uses the “best available” source of annotation cross-reference, with ordered logic.</p>
+<ol style="list-style-type: decimal">
+<li>If there is a perfect match by ENTREZID, it uses that.</li>
+<li>If the Entrez gene SYMBOL is a perfect match, it uses that.</li>
+<li>If the entry matches an accession number directly, it uses that.</li>
+<li>If the entry matches an ALIAS, it uses that.</li>
+</ol>
+<p>Other important features:</p>
+<ul>
+<li>For any input which matches more than one entry, multiple values are returned.</li>
+<li>The query can use case-insensitive steps, which is helpful for mouse gene symbols which are mixed-case “Ccl8”.</li>
+</ul>
+<p>The most error-prone cross-reference is <code>'ALIAS'</code>. Each step up the chain has more confidence. So it makes sense to start with the highest confidence, at the top of the list, then proceed down the list, only as needed.</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p>Install using the <code>remotes</code> package:</p>
-<p><code><a href="https://rdrr.io/pkg/remotes/man/install_github.html">remotes::install_github("jmw86069/genejam")</a></code></p>
-<p>Note: It is recommended not to use the <code>devtools</code> package to install Github packages, mostly because the <code>devtools</code> package has many more components than are required for installation. Instead, <code>devtools</code> includes all components needed to develop R packages, beyond the scope of installing one such R package.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"jmw86069/genejam"</span><span class="op">)</span></span></code></pre></div>
+<p>or with the <code>pak</code> package:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_install.html" class="external-link">pkg_install</a></span><span class="op">(</span><span class="st">"jmw86069/genejam"</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div id="freshengenes" class="section level2">
-<h2 class="hasAnchor">
-<a href="#freshengenes" class="anchor"></a>freshenGenes()</h2>
+<div class="section level2">
+<h2 id="freshengenes">freshenGenes()<a class="anchor" aria-label="anchor" href="#freshengenes"></a>
+</h2>
 <p>The simplest use is to supply a set of gene symbols:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="fu">genejam</span><span class="fu">::</span><span class="fu"><a href="reference/freshenGenes.html">freshenGenes</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"APOE"</span>, <span class="st">"APOA"</span>, <span class="st">"HIST1H1C"</span><span class="op">)</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">genejam</span><span class="fu">::</span><span class="fu"><a href="reference/freshenGenes.html">freshenGenes</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"APOE"</span>, <span class="st">"APOA"</span>, <span class="st">"HIST1H1C"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="kable-table">
 <table class="table">
-<thead><tr class="header">
+<thead><tr>
 <th align="left">input</th>
-<th align="left">intermediate</th>
+<th align="left">ENTREZID</th>
 <th align="left">SYMBOL</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td align="left">APOE</td>
 <td align="left">348</td>
 <td align="left">APOE</td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left">APOA</td>
 <td align="left">4018</td>
 <td align="left">LPA</td>
 </tr>
-<tr class="odd">
+<tr>
 <td align="left">HIST1H1C</td>
 <td align="left">3006</td>
 <td align="left">H1-2</td>
@@ -111,43 +123,43 @@
 </table>
 </div>
 <p>For slightly more detail, you can edit the argument <code>final</code> to include things like <code>"SYMBOL"</code> (default), <code>"GENENAME"</code>, <code>"ALIAS"</code>, <code>"ACCNUM"</code>, and more.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="fu">genejam</span><span class="fu">::</span><span class="fu"><a href="reference/freshenGenes.html">freshenGenes</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"APOE"</span>, <span class="st">"APOA"</span>, <span class="st">"HIST1H1C"</span><span class="op">)</span>,
-   final<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"SYMBOL"</span>, 
-      <span class="st">"GENENAME"</span>,
-      <span class="st">"ALIAS"</span><span class="op">)</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">genejam</span><span class="fu">::</span><span class="fu"><a href="reference/freshenGenes.html">freshenGenes</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"APOE"</span>, <span class="st">"APOA"</span>, <span class="st">"HIST1H1C"</span><span class="op">)</span>,</span>
+<span>   final<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SYMBOL"</span>, </span>
+<span>      <span class="st">"GENENAME"</span>,</span>
+<span>      <span class="st">"ALIAS"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="kable-table">
 <table class="table">
 <colgroup>
-<col width="8%">
-<col width="12%">
-<col width="6%">
-<col width="37%">
-<col width="35%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
 </colgroup>
-<thead><tr class="header">
+<thead><tr>
 <th align="left">input</th>
-<th align="left">intermediate</th>
+<th align="left">ENTREZID</th>
 <th align="left">SYMBOL</th>
 <th align="left">GENENAME</th>
 <th align="left">ALIAS</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td align="left">APOE</td>
 <td align="left">348</td>
 <td align="left">APOE</td>
 <td align="left">apolipoprotein E</td>
 <td align="left">AD2,APO-E,ApoE4,APOE,LDLCQ5,LPG</td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left">APOA</td>
 <td align="left">4018</td>
 <td align="left">LPA</td>
 <td align="left">lipoprotein(a)</td>
 <td align="left">AK38,APOA,LP,LPA</td>
 </tr>
-<tr class="odd">
+<tr>
 <td align="left">HIST1H1C</td>
 <td align="left">3006</td>
 <td align="left">H1-2</td>
@@ -158,127 +170,127 @@
 </table>
 </div>
 </div>
-<div id="convenience-function-freshengenes2" class="section level2">
-<h2 class="hasAnchor">
-<a href="#convenience-function-freshengenes2" class="anchor"></a>Convenience function freshenGenes2()</h2>
+<div class="section level2">
+<h2 id="convenience-function-freshengenes2">Convenience function freshenGenes2()<a class="anchor" aria-label="anchor" href="#convenience-function-freshengenes2"></a>
+</h2>
 <p>I frequently find myself wanting gene symbol, and the long gene name, so I created a simple function <code><a href="reference/freshenGenes2.html">freshenGenes2()</a></code> that uses default argument <code>final=c("SYMBOL", "GENENAME")</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="fu">genejam</span><span class="fu">::</span><span class="fu"><a href="reference/freshenGenes2.html">freshenGenes2</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"APOE"</span>, <span class="st">"APOA"</span>, <span class="st">"HIST1H1C"</span><span class="op">)</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">genejam</span><span class="fu">::</span><span class="fu"><a href="reference/freshenGenes2.html">freshenGenes2</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"APOE"</span>, <span class="st">"APOA"</span>, <span class="st">"HIST1H1C"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="kable-table">
 <table class="table">
-<thead><tr class="header">
+<thead><tr>
 <th align="left">input</th>
-<th align="left">intermediate</th>
-<th align="left">SYMBOL</th>
-<th align="left">GENENAME</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">APOE</td>
-<td align="left">348</td>
-<td align="left">APOE</td>
-<td align="left">apolipoprotein E</td>
-</tr>
-<tr class="even">
-<td align="left">APOA</td>
-<td align="left">4018</td>
-<td align="left">LPA</td>
-<td align="left">lipoprotein(a)</td>
-</tr>
-<tr class="odd">
-<td align="left">HIST1H1C</td>
-<td align="left">3006</td>
-<td align="left">H1-2</td>
-<td align="left">H1.2 linker histone, cluster member</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="convenience-function-freshengenes3" class="section level2">
-<h2 class="hasAnchor">
-<a href="#convenience-function-freshengenes3" class="anchor"></a>Convenience function freshenGenes3()</h2>
-<p>The other common use case is to include other gene aliases, with the function <code><a href="reference/freshenGenes3.html">freshenGenes3()</a></code>:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="fu">genejam</span><span class="fu">::</span><span class="fu"><a href="reference/freshenGenes3.html">freshenGenes3</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"APOE"</span>, <span class="st">"APOA"</span>, <span class="st">"HIST1H1C"</span><span class="op">)</span><span class="op">)</span></pre></div>
-<div class="kable-table">
-<table class="table">
-<colgroup>
-<col width="8%">
-<col width="12%">
-<col width="6%">
-<col width="37%">
-<col width="35%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">input</th>
-<th align="left">intermediate</th>
-<th align="left">SYMBOL</th>
-<th align="left">GENENAME</th>
-<th align="left">ALIAS</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">APOE</td>
-<td align="left">348</td>
-<td align="left">APOE</td>
-<td align="left">apolipoprotein E</td>
-<td align="left">AD2,APO-E,ApoE4,APOE,LDLCQ5,LPG</td>
-</tr>
-<tr class="even">
-<td align="left">APOA</td>
-<td align="left">4018</td>
-<td align="left">LPA</td>
-<td align="left">lipoprotein(a)</td>
-<td align="left">AK38,APOA,LP,LPA</td>
-</tr>
-<tr class="odd">
-<td align="left">HIST1H1C</td>
-<td align="left">3006</td>
-<td align="left">H1-2</td>
-<td align="left">H1.2 linker histone, cluster member</td>
-<td align="left">H1-2,H1.2,H1C,H1F2,H1s-1,HIST1H1C</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="slightly-more-advanced" class="section level2">
-<h2 class="hasAnchor">
-<a href="#slightly-more-advanced" class="anchor"></a>Slightly more advanced</h2>
-<p>What if you already have Entrez gene ID, and want associated annotations? The function <code><a href="reference/freshenGenes.html">freshenGenes()</a></code> runs two steps:</p>
-<ol>
-<li>convert input to <code>intermediate</code> (which is the Entrez gene ID)</li>
-<li>convert <code>intermediate</code> to the output defined by <code>final</code>, for example <code>final=c("SYMBOL")</code> would create a column <code>"SYMBOL"</code>.</li>
-</ol>
-<p>In this example, the Entrez gene ID values are in a column <code>"ENTREZID"</code>, so we will use argument <code>intermediate="ENTREZID"</code>. In this case, you already have <code>"intermediate"</code>, so you invoke the function with a <code>data.frame</code> with values in a column named <code>"intermediate"</code>, and set <code>try_list=NULL</code>.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>ENTREZID<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"348"</span>, <span class="st">"4018"</span>, <span class="st">"3006"</span>, <span class="st">"100"</span><span class="op">)</span><span class="op">)</span>;
-<span class="fu">genejam</span><span class="fu">::</span><span class="fu"><a href="reference/freshenGenes2.html">freshenGenes2</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">df</span>, intermediate<span class="op">=</span><span class="st">"ENTREZID"</span><span class="op">)</span></pre></div>
-<div class="kable-table">
-<table class="table">
-<thead><tr class="header">
 <th align="left">ENTREZID</th>
 <th align="left">SYMBOL</th>
 <th align="left">GENENAME</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
+<td align="left">APOE</td>
 <td align="left">348</td>
 <td align="left">APOE</td>
 <td align="left">apolipoprotein E</td>
 </tr>
-<tr class="even">
+<tr>
+<td align="left">APOA</td>
 <td align="left">4018</td>
 <td align="left">LPA</td>
 <td align="left">lipoprotein(a)</td>
 </tr>
-<tr class="odd">
+<tr>
+<td align="left">HIST1H1C</td>
 <td align="left">3006</td>
 <td align="left">H1-2</td>
 <td align="left">H1.2 linker histone, cluster member</td>
 </tr>
-<tr class="even">
+</tbody>
+</table>
+</div>
+</div>
+<div class="section level2">
+<h2 id="convenience-function-freshengenes3">Convenience function freshenGenes3()<a class="anchor" aria-label="anchor" href="#convenience-function-freshengenes3"></a>
+</h2>
+<p>The other common use case is to include other gene aliases, with the function <code><a href="reference/freshenGenes3.html">freshenGenes3()</a></code>:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">genejam</span><span class="fu">::</span><span class="fu"><a href="reference/freshenGenes3.html">freshenGenes3</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"APOE"</span>, <span class="st">"APOA"</span>, <span class="st">"HIST1H1C"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="kable-table">
+<table class="table">
+<colgroup>
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+</colgroup>
+<thead><tr>
+<th align="left">input</th>
+<th align="left">ENTREZID</th>
+<th align="left">SYMBOL</th>
+<th align="left">GENENAME</th>
+<th align="left">ALIAS</th>
+</tr></thead>
+<tbody>
+<tr>
+<td align="left">APOE</td>
+<td align="left">348</td>
+<td align="left">APOE</td>
+<td align="left">apolipoprotein E</td>
+<td align="left">AD2,APO-E,ApoE4,APOE,LDLCQ5,LPG</td>
+</tr>
+<tr>
+<td align="left">APOA</td>
+<td align="left">4018</td>
+<td align="left">LPA</td>
+<td align="left">lipoprotein(a)</td>
+<td align="left">AK38,APOA,LP,LPA</td>
+</tr>
+<tr>
+<td align="left">HIST1H1C</td>
+<td align="left">3006</td>
+<td align="left">H1-2</td>
+<td align="left">H1.2 linker histone, cluster member</td>
+<td align="left">H1-2,H1.2,H1C,H1F2,H1s-1,HIST1H1C</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section level2">
+<h2 id="slightly-more-advanced">Slightly more advanced<a class="anchor" aria-label="anchor" href="#slightly-more-advanced"></a>
+</h2>
+<p>What if you already have Entrez gene ID, and want associated annotations? The function <code><a href="reference/freshenGenes.html">freshenGenes()</a></code> runs two steps:</p>
+<ol style="list-style-type: decimal">
+<li>convert input to <code>intermediate</code> (which is the Entrez gene ID)</li>
+<li>convert <code>intermediate</code> to the output defined by <code>final</code>, for example <code>final=c("SYMBOL")</code> would create a column <code>"SYMBOL"</code>.</li>
+</ol>
+<p>In this example, the Entrez gene ID values are in a column <code>"ENTREZID"</code>, so we will use argument <code>intermediate="ENTREZID"</code>. In this case, you already have <code>"intermediate"</code>, so you invoke the function with a <code>data.frame</code> with values in a column named <code>"intermediate"</code>, and set <code>try_list=NULL</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>ENTREZID<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"348"</span>, <span class="st">"4018"</span>, <span class="st">"3006"</span>, <span class="st">"100"</span><span class="op">)</span><span class="op">)</span>;</span>
+<span><span class="fu">genejam</span><span class="fu">::</span><span class="fu"><a href="reference/freshenGenes2.html">freshenGenes2</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">df</span>, intermediate<span class="op">=</span><span class="st">"ENTREZID"</span><span class="op">)</span></span></code></pre></div>
+<div class="kable-table">
+<table class="table">
+<thead><tr>
+<th align="left">ENTREZID</th>
+<th align="left">SYMBOL</th>
+<th align="left">GENENAME</th>
+</tr></thead>
+<tbody>
+<tr>
+<td align="left">348</td>
+<td align="left">APOE</td>
+<td align="left">apolipoprotein E</td>
+</tr>
+<tr>
+<td align="left">4018</td>
+<td align="left">LPA</td>
+<td align="left">lipoprotein(a)</td>
+</tr>
+<tr>
+<td align="left">3006</td>
+<td align="left">H1-2</td>
+<td align="left">H1.2 linker histone, cluster member</td>
+</tr>
+<tr>
 <td align="left">100</td>
 <td align="left">ADA</td>
 <td align="left">adenosine deaminase</td>
@@ -287,34 +299,34 @@
 </table>
 </div>
 <p>Similarly, you can provide input with a mixture of gene symbols and Entrez gene ID values. Shown below is mixed input.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>Gene<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"MINA"</span>, <span class="st">""</span>, <span class="st">"GABRR3"</span>, <span class="st">"GABRR3"</span>, <span class="st">""</span><span class="op">)</span>,
-   ENTREZID<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">""</span>, <span class="st">"84864"</span>, <span class="st">""</span>, <span class="st">"200959"</span>, <span class="st">"200959"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">idf</span></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">idf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Gene<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MINA"</span>, <span class="st">""</span>, <span class="st">"GABRR3"</span>, <span class="st">"GABRR3"</span>, <span class="st">""</span><span class="op">)</span>,</span>
+<span>   ENTREZID<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">""</span>, <span class="st">"84864"</span>, <span class="st">""</span>, <span class="st">"200959"</span>, <span class="st">"200959"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">idf</span></span></code></pre></div>
 <div class="kable-table">
 <table class="table">
-<thead><tr class="header">
+<thead><tr>
 <th align="left">Gene</th>
 <th align="left">ENTREZID</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td align="left">MINA</td>
 <td align="left"></td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left"></td>
 <td align="left">84864</td>
 </tr>
-<tr class="odd">
+<tr>
 <td align="left">GABRR3</td>
 <td align="left"></td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left">GABRR3</td>
 <td align="left">200959</td>
 </tr>
-<tr class="odd">
+<tr>
 <td align="left"></td>
 <td align="left">200959</td>
 </tr>
@@ -322,66 +334,66 @@
 </table>
 </div>
 <p>You only need to specify <code>intermediate="ENTREZID"</code> as before.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="fu">genejam</span><span class="fu">::</span><span class="fu"><a href="reference/freshenGenes2.html">freshenGenes2</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">idf</span>, intermediate<span class="op">=</span><span class="st">"ENTREZID"</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">genejam</span><span class="fu">::</span><span class="fu"><a href="reference/freshenGenes2.html">freshenGenes2</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">idf</span>, intermediate<span class="op">=</span><span class="st">"ENTREZID"</span><span class="op">)</span></span></code></pre></div>
 <div class="kable-table">
 <table class="table">
 <colgroup>
-<col width="6%">
-<col width="8%">
-<col width="6%">
-<col width="77%">
+<col width="10%">
+<col width="12%">
+<col width="10%">
+<col width="67%">
 </colgroup>
-<thead><tr class="header">
+<thead><tr>
 <th align="left">Gene</th>
 <th align="left">ENTREZID</th>
 <th align="left">SYMBOL</th>
 <th align="left">GENENAME</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td align="left">MINA</td>
 <td align="left">84864</td>
 <td align="left">RIOX2</td>
 <td align="left">ribosomal oxygenase 2</td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left"></td>
 <td align="left">84864</td>
 <td align="left">RIOX2</td>
 <td align="left">ribosomal oxygenase 2</td>
 </tr>
-<tr class="odd">
+<tr>
 <td align="left">GABRR3</td>
 <td align="left">200959</td>
 <td align="left">GABRR3</td>
-<td align="left">gamma-aminobutyric acid type A receptor rho3 subunit (gene/pseudogene)</td>
+<td align="left">gamma-aminobutyric acid type A receptor subunit rho3</td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left">GABRR3</td>
 <td align="left">200959</td>
 <td align="left">GABRR3</td>
-<td align="left">gamma-aminobutyric acid type A receptor rho3 subunit (gene/pseudogene)</td>
+<td align="left">gamma-aminobutyric acid type A receptor subunit rho3</td>
 </tr>
-<tr class="odd">
+<tr>
 <td align="left"></td>
 <td align="left">200959</td>
 <td align="left">GABRR3</td>
-<td align="left">gamma-aminobutyric acid type A receptor rho3 subunit (gene/pseudogene)</td>
+<td align="left">gamma-aminobutyric acid type A receptor subunit rho3</td>
 </tr>
 </tbody>
 </table>
 </div>
 <p>Notice the values in <code>"ENTREZID"</code> are updated based upon the first step resolution of <code>"Gene"</code> values to <code>"ENTREZID"</code>. The <code>"SYMBOL"</code> and <code>"GENENAME"</code> columns are populated using values in <code>"ENTREZID"</code>.</p>
 </div>
-<div id="when-is-genejam-useful" class="section level2">
-<h2 class="hasAnchor">
-<a href="#when-is-genejam-useful" class="anchor"></a>When is genejam useful?</h2>
+<div class="section level2">
+<h2 id="when-is-genejam-useful">When is genejam useful?<a class="anchor" aria-label="anchor" href="#when-is-genejam-useful"></a>
+</h2>
 <p>The official gene nomenclature is updated multiple times per year, which means one Entrez gene ID may have a different official gene symbol before and after the update. When comparing data from two experiments, it is important to use the same gene nomenclature. Otherwise, there will be differences in results only because the names of some genes are different.</p>
 <p>Most microarray platforms provide gene annotations, which are updated much less frequently than the official genes. For example, Affymetrix array “Clariom D Human” was last updated between 2016 and 2018 (this document was written in 2021.) In order to compare microarray results to those from literature, biological pathways, or other experiments, the gene nomenclature needs to be updated to the most current version.</p>
-<div id="rationale-for-the-workflow" class="section level3">
-<h3 class="hasAnchor">
-<a href="#rationale-for-the-workflow" class="anchor"></a>Rationale for the workflow</h3>
+<div class="section level3">
+<h3 id="rationale-for-the-workflow">Rationale for the workflow<a class="anchor" aria-label="anchor" href="#rationale-for-the-workflow"></a>
+</h3>
 <p>In rare cases an official gene symbol is “moved” from one Entrez gene ID to another, usually when the original Entrez gene ID is deleted. In these cases, the most reasonable link between an experimental asay and the targeted gene is the gene symbol. An alternative is to use a sequence accession number used to design the assay.</p>
 <p>As a result, a “best possible” gene annotation strategy is used.</p>
 <ul>
@@ -394,61 +406,75 @@
 <p>Ultimately the workflow is what I and others have been doing all along, to assemble the best available gene annotations for a given dataset, while also leaving behind the fewest possible un-annotated entries. When one source of annotation fails, try another on missing entries; and so on.</p>
 </div>
 </div>
-<div id="optimizations" class="section level2">
-<h2 class="hasAnchor">
-<a href="#optimizations" class="anchor"></a>Optimizations</h2>
+<div class="section level2">
+<h2 id="optimizations">Optimizations<a class="anchor" aria-label="anchor" href="#optimizations"></a>
+</h2>
 <p>The steps used in <code>genejam</code> are designed for speed, to the extent that providing 100,000 rows should return results within a few seconds at most. Only unique values are queried, and only missing entries are updated. When multiple values are combined by a delimiter, a highly optimized method is used.</p>
 <p>Lastly, these operations also use optimized mixed-alphanumeric sorting even in the context of a <code>list</code>, so things like <code>"chr2"</code> will appear before <code>"chr10"</code> in sort order. Incidentally, a sort step is necessary so you can compare whether two entries are associated with the same genes. If one is stored as <code>"APOE,APOE4"</code> and the other as <code>"APOE4,APOE"</code>, this comparison fails.</p>
 <p>All that to say, I use these functions a lot so I need them to be reliable and fast. It takes a few seconds just to load the associated SQLite gene annotation data, and the process used by <code><a href="reference/freshenGenes.html">freshenGenes()</a></code> is usually substantially faster than that step alone.</p>
 </div>
-<div id="package-reference" class="section level2">
-<h2 class="hasAnchor">
-<a href="#package-reference" class="anchor"></a>Package Reference</h2>
+<div class="section level2">
+<h2 id="package-reference">Package Reference<a class="anchor" aria-label="anchor" href="#package-reference"></a>
+</h2>
 <p>A full online function reference is available via the pkgdown documentation:</p>
-<p>Full genejam command reference: <a href="https://jmw86069.github.io/genejam" class="uri">https://jmw86069.github.io/genejam</a></p>
+<p>Full genejam command reference: <a href="https://jmw86069.github.io/genejam" class="external-link uri">https://jmw86069.github.io/genejam</a></p>
 </div>
 
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="http://github.com/jmw86069/genejam/">http://​github.com/​jmw86069/​genejam/​</a>
-</li>
-<li>Report a bug at <br><a href="http://github.com/jmw86069/genejam/issues">http://​github.com/​jmw86069/​genejam/​issues</a>
-</li>
+<li><a href="http://github.com/jmw86069/genejam/" class="external-link">Browse source code</a></li>
+<li><a href="http://github.com/jmw86069/genejam/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li><a href="https://www.r-project.org/Licenses/GPL-2">GPL-2</a></li>
+<li><a href="https://www.r-project.org/Licenses/GPL-2" class="external-link">GPL-2</a></li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing genejam</a></li>
+</ul>
+</div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>James M. Ward <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-9510-2848" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>James M. Ward <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-9510-2848" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
 </div>
+
+
 
   </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by James M. Ward.</p>
+  <p></p>
+<p>Developed by James M. Ward.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
       </footer>
 </div>
 
-  
+
+
+
 
 
   </body>

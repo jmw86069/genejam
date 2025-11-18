@@ -25,7 +25,7 @@ freshenGenes2 <- function
  empty_rule=c("empty", "original", "na"),
  include_source=FALSE,
  protect_inline_sep=TRUE,
- intermediate="intermediate",
+ intermediate="ENTREZID",
  verbose=FALSE,
  ...)
 {
@@ -73,7 +73,7 @@ freshenGenes3 <- function
  empty_rule=c("empty", "original", "na"),
  include_source=FALSE,
  protect_inline_sep=TRUE,
- intermediate="intermediate",
+ intermediate="ENTREZID",
  verbose=FALSE,
  ...)
 {

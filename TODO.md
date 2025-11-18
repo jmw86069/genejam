@@ -1,5 +1,11 @@
 # TODO for genejam
 
+## 17nov2025
+
+* For efficiency, do not prepare every annotation until necessary.
+Test with 'CCL8', 'ADCK1' which only requires "SYMBOL2EG".
+
+
 ## 17sep2025
 
 * DONE. Investigate `"Lars"` for "org.Mm.eg.db" and `ignore.case=TRUE`,

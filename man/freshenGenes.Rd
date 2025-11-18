@@ -10,12 +10,13 @@ freshenGenes(
   try_list = c("SYMBOL2EG", "ACCNUM2EG", "ALIAS2EG"),
   final = c("SYMBOL"),
   split = "[ ]*[,/;]+[ ]*",
+  revert_split = TRUE,
   sep = ",",
   handle_multiple = c("first_try", "first_hit", "all", "best_each"),
   empty_rule = c("empty", "original", "na"),
   include_source = FALSE,
   protect_inline_sep = TRUE,
-  intermediate = "intermediate",
+  intermediate = "ENTREZID",
   ignore.case = FALSE,
   verbose = FALSE,
   ...
@@ -53,21 +54,33 @@ by the function \code{base::strsplit()}. The default will split values
 separated by comma \verb{,} semicolon \verb{;} or forward slash \code{/}, and will
 trim whitespace before and after these delimiters.}
 
+\item{revert_split}{\code{logical} default TRUE, whether to revert the
+internal split with argument \code{split}, which causes columns with
+delimited values to be split into single value per column.
+When \code{revert_split=TRUE} the columns are re-combined to match
+the original data. Note that values are combined using \code{sep}
+as delimiter, which may not be identical to the input data.}
+
 \item{sep}{\code{character} value used to concatenate multiple entries in
 the same field. The default \code{sep=","} will comma-delimit multiple
 entries in the same field.}
 
 \item{handle_multiple}{\code{character} value indicating how to handle multiple
-values: \code{"first_hit"} will query each column of \code{x} until it finds the
+values:
+\itemize{
+\item \code{"first_hit"} will query each column of \code{x} until it finds the
 first possible returning match, and will ignore all subsequent possible
 matches for that row in \code{x}. For example, if one row in \code{x} contains
-multiple values, only the first match will be used. \code{"first_try"}
+multiple values, only the first match will be used.
+\item \code{"first_try"}
 will return the first match from \code{try_list} for all columns in \code{x}
 that contain a match. For example, if one row in \code{x} contains two
 values, the first match from \code{try_list} using one or both columns in
 \code{x} will be maintained. Subsequent entries in \code{try_list} will not be
-attempted for rows that already have a match. \code{"all"} will return all
-possible matches for all entries in \code{x} using all items in \code{try_list}.}
+attempted for rows that already have a match.
+\item \code{"all"} will return all
+possible matches for all entries in \code{x} using all items in \code{try_list}.
+}}
 
 \item{empty_rule}{\code{character} value indicating how to handle entries which
 did not have a match, and are therefore empty: \code{"original"} will use
@@ -232,12 +245,16 @@ if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
 
 if (suppressPackageStartupMessages(require(org.Hs.eg.db))) {
    ## More advanced, match affymetrix probesets
-   if (suppressPackageStartupMessages(require(hgu133plus2.db))) {
+   if (requireNamespace("hgu133plus2.db", quietly=TRUE) &&
+      suppressPackageStartupMessages(require("hgu133plus2.db"))) {
       cat("\nAdvanced example including Affymetrix probesets.\n");
-      print(freshenGenes(c("227047_x_at","APOE","HIST1H1D","NM_003166,U08032"),
+      affy_df <- freshenGenes(
+         c("227047_x_at", "APOE", "HIST1H1D", "NM_003166,U08032"),
          include_source=TRUE,
-         try_list=c("hgu133plus2ENTREZID","REFSEQ2EG","SYMBOL2EG","ACCNUM2EG","ALIAS2EG"),
-         final=c("SYMBOL","GENENAME")))
+         try_list=c("hgu133plus2ENTREZID", "REFSEQ2EG",
+            "SYMBOL2EG", "ACCNUM2EG", "ALIAS2EG"),
+         final=c("SYMBOL", "GENENAME"))
+      print(affy_df)
    }
 }
 
