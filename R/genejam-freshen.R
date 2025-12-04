@@ -354,8 +354,6 @@ freshenGenes <- function
          )
       );
       x_newsplit_colnames <- setdiff(colnames(x), x_input_colnames);
-      # jamba::printDebug("x_newsplit_colnames:");print(x_newsplit_colnames);# debug
-      # jamba::printDebug("head(x, 5):");print(head(x, 5));# debug
    }
    # updated to ignore intermediate and intermediate_source
    xnames <- setdiff(colnames(x),
@@ -496,12 +494,13 @@ freshenGenes <- function
             ivals <- jamba::cPaste(ivals_l,
                sep=sep,
                na.rm=TRUE);
-
             names(ivals) <- ixu;
+            
             ivals <- ivals[!is.na(ivals)];
+            # expand to original vector length
             ixnew <- ivals[match(ix, names(ivals))];
             ixdo <- (nchar(ixnew) > 0);
-            
+
             iname_tryname <- itryname;
             if (any(c("first_try", "all") %in% handle_multiple)) {
                # fix slight bug in handling ifound_source=""
@@ -509,11 +508,12 @@ freshenGenes <- function
                ifound_source[ido][ixdo] <- ifelse(
                   nchar(ifound[ido][ixdo]) == 0,
                   iname_tryname,
-                  ifelse(nchar(ifound_source[ido][ixdo]) == 0,
+                  ifelse(
+                     is_empty(ifound_source[ido][ixdo]),
                      iname_tryname,
                      paste0(ifound_source[ido][ixdo], sep, iname_tryname)));
                ifound[ido][ixdo] <- ifelse(
-                  nchar(ifound[ido][ixdo]) == 0,
+                  is_empty(ifound[ido][ixdo]),
                   ixnew[ixdo],
                   paste0(ifound[ido][ixdo], sep, ixnew[ixdo]));
             } else {
@@ -604,9 +604,9 @@ freshenGenes <- function
       #colnames(x) <- xnames;
 
       ## LOC# recovery for entries that have no intermediate
-      # 30mar2021 this change in isempty should be slightly faster
-      #isempty <- (nchar(jamba::rmNA(naValue="", x[[intermediate]])) == 0);
-      #isempty <- (is.na(x[[intermediate]]) | nchar(x[[intermediate]]) == 0);
+      ## 30mar2021 this change in isempty should be slightly faster than:
+      # isempty <- (nchar(jamba::rmNA(naValue="", x[[intermediate]])) == 0);
+      # isempty <- (is.na(x[[intermediate]]) | nchar(x[[intermediate]]) == 0);
       isempty <- genejam::is_empty(x[[intermediate]]);
       if (any(isempty) && length(xnames) > 0) {
          xnames1 <- head(xnames, 1);
@@ -628,8 +628,8 @@ freshenGenes <- function
          }
       }
       
-      ###################################
-      ## 0.0.19.900: Revert input colnames
+      ##################################################################
+      ## 0.0.19.900: Revert input colnames with split delimited values
       if (isTRUE(revert_split) && length(x_newsplit_colnames) > 0) {
          #
          # x_newsplit_factor <- gsub("_v[0-9]+$", "", x_newsplit_colnames);
@@ -680,18 +680,25 @@ freshenGenes <- function
       
       if ("original" %in% empty_rule) {
          ifinal <- head(final, 1);
-         # 30mar2021 this change in isempty should be slightly faster
-         #isempty <- (nchar(jamba::rmNA(naValue="", x[[ifinal]])) == 0);
-         #isempty <- (is.na(x[[intermediate]]) | nchar(x[[intermediate]]) == 0);
-         isempty <- genejam::is_empty(x[[intermediate]]);
-         x[[ifinal]][isempty] <- x[[1]][isempty];
+         
+         ## 0.0.19.900: replace based upon intermediate
+         # isempty <- genejam::is_empty(x[[intermediate]]);
+         
+         ## 0.0.20.900: replace based upon the first final
+         # Todo: Consider whether to populate source?
+         isempty <- genejam::is_empty(x[[ifinal]]);
+         
+         ## use column 1 values
+         if (any(isempty)) {
+            x[[ifinal]][isempty] <- x[[1]][isempty];
+         }
       } else if ("na" %in% empty_rule) {
          ifinal <- head(final, 1);
-         # 30mar2021 this change in isempty should be slightly faster
-         #isempty <- (nchar(jamba::rmNA(naValue="", x[[ifinal]])) == 0);
-         #isempty <- (is.na(x[[intermediate]]) | nchar(x[[intermediate]]) == 0);
          isempty <- genejam::is_empty(x[[intermediate]]);
-         x[[ifinal]][isempty] <- NA;
+         ## Fill with NA
+         if (any(isempty)) {
+            x[[ifinal]][isempty] <- NA;
+         }
       }
    }
    

@@ -1,3 +1,21 @@
+# Version 0.0.20.900
+
+## Changes
+
+* Changed from GPL-2 to MIT license, added proper LICENSE files.
+
+## Bug fixes
+
+* `freshenGenes()`
+
+   * Fixed `empty_rule="original"` when 'ENTREZID' is populated but not valid,
+   causing the `final` entries to be empty. Now it properly fills in
+   the original value.
+   * Fixed when the intermediate column ('ENTREZID') had NA instead of ""
+   for empty values. This situation only occurred when input `data.frame`
+   also included the intermediate column.
+   Previously these rows were not filled properly.
+
 # Version 0.0.19.900
 
 * Moved 'AnnotationDbi' to Imports.

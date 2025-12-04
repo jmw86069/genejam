@@ -7,22 +7,30 @@ symbols to represent equivalent genes.
 The notable behavior is that it uses the “best available” source of
 annotation cross-reference, with ordered logic.
 
-1.  If there is a perfect match by ENTREZID, it uses that.
-2.  If the Entrez gene SYMBOL is a perfect match, it uses that.
-3.  If the entry matches an accession number directly, it uses that.
-4.  If the entry matches an ALIAS, it uses that.
+1.  If ENTREZID is a perfect match, use that. (NCBI Entrez gene ID)
+2.  If SYMBOL is a perfect match, use that. (NCBI Entrez gene symbol)
+3.  If ACCNUM is a match, it uses that. (Any accession number)
+4.  If ALIAS is a match, it uses that. (Other gene aliases, xrefs)
+
+The ‘ALIAS’ option may find multiple genes. Sometimes this is the best
+available option, so be it. However, it is only used after trying
+ENTREZID, then official gene symbol, then accession numbers first.
+
+This step may be customized, for example it is appropriate to include
+other accession number sources such as: UNIPROT, ENSEMBL, ENSEMBLTRANS,
+and platform identifiers such as Affymetrix or Illumina PROBE_SET_ID or
+PROBEID.
 
 Other important features:
 
 - For any input which matches more than one entry, multiple values are
   returned.
 - The query can use case-insensitive steps, which is helpful for mouse
-  gene symbols which are mixed-case “Ccl8”.
-
-The most error-prone cross-reference is `'ALIAS'`. Each step up the
-chain has more confidence. So it makes sense to start with the highest
-confidence, at the top of the list, then proceed down the list, only as
-needed.
+  gene symbols which are mixed-case “Ccl8”. However, there are also
+  genes in mouse ‘Gs’ is the gene “greasy” ENTREZID 109550, and
+  lowercase ‘gs’ is the gene “glabrous”, ENTREZID 14835. Sometimes the
+  specific capitalization is useful, so the default method uses
+  `ignore.case=FALSE`.
 
 ## Installation
 

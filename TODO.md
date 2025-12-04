@@ -1,5 +1,14 @@
 # TODO for genejam
 
+## 01dec2025
+
+* FIXED. Fix bug when intermediate is populated but not valid, leading to empty
+values in final column.
+* FIXED. Bug empty_rule="original" not applied when intermediate is not empty.
+
+   * Specifically, the intermediate has a value, not resolved by the first
+   `final` value, suggesting it should use the original value and not be empty.
+
 ## 17nov2025
 
 * For efficiency, do not prepare every annotation until necessary.

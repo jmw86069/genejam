@@ -1,7 +1,18 @@
 destination: docs
+home:
+  title: Genejam to Resolve Gene Symbols, Aliases, and Accession Numbers.
+  description: Gene symbol, alias, and other annotation assignment
+    using a prioritized order of annotation sources for maximum confidence.
+figures:
+  dev: ragg::agg_png
+  fig.width: 8
+  fig.height: 8
+  fig.retina: 2
+  dpi: 96
 template:
-  params:
-    bootswatch: cosmo
+  bootstrap: 5
+  bootswatch: cosmo
+url: https://jmw86069.github.io/genejam/
 reference:
 - title: GeneJam core functions
   desc: Functions that assist with gene annotations

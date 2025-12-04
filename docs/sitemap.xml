@@ -1,18 +1,20 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
-<url><loc>/404.html</loc></url>
-<url><loc>/authors.html</loc></url>
-<url><loc>/index.html</loc></url>
-<url><loc>/news/index.html</loc></url>
-<url><loc>/reference/better_exists.html</loc></url>
-<url><loc>/reference/better_get.html</loc></url>
-<url><loc>/reference/freshenGenes.html</loc></url>
-<url><loc>/reference/freshenGenes2.html</loc></url>
-<url><loc>/reference/freshenGenes3.html</loc></url>
-<url><loc>/reference/get_anno_db.html</loc></url>
-<url><loc>/reference/imget.html</loc></url>
-<url><loc>/reference/index.html</loc></url>
-<url><loc>/reference/is_empty.html</loc></url>
-<url><loc>/reference/lgsub.html</loc></url>
-<url><loc>/TODO.html</loc></url>
+<url><loc>https://jmw86069.github.io/genejam/404.html</loc></url>
+<url><loc>https://jmw86069.github.io/genejam/authors.html</loc></url>
+<url><loc>https://jmw86069.github.io/genejam/index.html</loc></url>
+<url><loc>https://jmw86069.github.io/genejam/LICENSE-text.html</loc></url>
+<url><loc>https://jmw86069.github.io/genejam/LICENSE.html</loc></url>
+<url><loc>https://jmw86069.github.io/genejam/news/index.html</loc></url>
+<url><loc>https://jmw86069.github.io/genejam/reference/better_exists.html</loc></url>
+<url><loc>https://jmw86069.github.io/genejam/reference/better_get.html</loc></url>
+<url><loc>https://jmw86069.github.io/genejam/reference/freshenGenes.html</loc></url>
+<url><loc>https://jmw86069.github.io/genejam/reference/freshenGenes2.html</loc></url>
+<url><loc>https://jmw86069.github.io/genejam/reference/freshenGenes3.html</loc></url>
+<url><loc>https://jmw86069.github.io/genejam/reference/get_anno_db.html</loc></url>
+<url><loc>https://jmw86069.github.io/genejam/reference/imget.html</loc></url>
+<url><loc>https://jmw86069.github.io/genejam/reference/index.html</loc></url>
+<url><loc>https://jmw86069.github.io/genejam/reference/is_empty.html</loc></url>
+<url><loc>https://jmw86069.github.io/genejam/reference/lgsub.html</loc></url>
+<url><loc>https://jmw86069.github.io/genejam/TODO.html</loc></url>
 </urlset>
 

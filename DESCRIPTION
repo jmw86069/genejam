@@ -1,6 +1,6 @@
 Package: genejam
-Title: Gene Jam
-Version: 0.0.19.900
+Title: Resolve Gene Symbols, Aliases, and Accession Numbers.
+Version: 0.0.20.900
 Authors@R: c(
     person(given="James M.",
        family="Ward",
@@ -8,7 +8,8 @@ Authors@R: c(
        comment=c(ORCID="0000-0002-9510-2848"),
        role=c("aut", "cre"))
    )
-Description: Gene annotation utility functions.
+Description: Gene symbol, alias, and annotation functions
+    using a prioritized order of gene assignment for maximum confidence.
 biocViews:
 Depends: R (>= 3.6.0)
 Imports: jamba (>= 1.0.4),
@@ -18,11 +19,11 @@ Suggests:
     testthat (>= 3.0.0)
 Enhances:
     org.Mm.eg.db
-License: GPL-2
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-URL: http://github.com/jmw86069/genejam
-BugReports: http://github.com/jmw86069/genejam/issues
+URL: https://jmw86069.github.io/genejam/
+BugReports: https://github.com/jmw86069/genejam/issues
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
